@@ -1,0 +1,135 @@
+# TODO: Better name for `signature_contents`.
+# TODO: Should there be the ability to specify valid values? Pro: More
+# information in config file rather than in code. Con: How to specify complex
+# values such as `Register` objects or (esp. for `direct`) the possibility for
+# both integers *and* register objects?
+signature_contents:
+    direct:
+        length: 8
+        short: null
+    register:
+        length: 3
+        short: "r"
+    indirect:
+        length: 1
+        short: "i"
+    immediate:
+        legnth: 8
+        short: null
+    relative:
+        length: 8
+        short: null
+    addr11:
+        length: 11
+        short: "a"
+    accu:
+        length: 0
+        short: null
+    # And so on...
+mnemonics:
+    ACALL:
+        - signature: ["addr11"]
+          opcode:
+              - ["a10", "a9", "a8", 1, 0, 0, 0, 1]
+              - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
+    ADD:
+        - signature: ["direct"]
+          opcode:
+              - [0b0010_0101]
+              - ["direct"]
+        - signature: ["register"]
+          opcode:
+              - [0, 0, 1, 0, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 0, 1, 0, 0, 1, 1, "i0"]
+    ADDI:
+        - signature: ["immediate"]
+          opcode:
+              - [0b0010_0100]
+              - ["immediate"]
+    ADDC:
+        - signature: ["direct"]
+          opcode:
+              - [0b0011_0101]
+              - ["direct"]
+        - signature: ["register"]
+          opcode:
+              - [0, 0, 1, 1, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 0, 1, 1, 0, 1, 1, "i0"]
+    ADDCI:
+        - signature: ["immediate"]
+          opcode:
+              - [0b0011_0100]
+              - ["immediate"]
+    AJMP:
+        - signature: ["addr11"]
+          opcode:
+              - ["a10", "a9", "a8", 0, 0, 0, 0, 1]
+              - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
+              # alternatively: `- ["low(addr11)"]`‽
+    AND:
+        - signature: ["direct"]
+          opcode:
+              - [0b0101_0101]
+              - ["direct"]
+        - signature: ["register"]
+          opcode:
+              - [0, 1, 0, 1, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 1, 0, 1, 0, 1, 1, "i0"]
+        - signature: ["direct", "immediate"]
+          opcode:
+              - [0b0101_0011]
+              - ["direct"]
+              - ["immediate"]
+        - signature: ["direct", "accu"]
+          opcode:
+              - [0b0101_0010]
+              - ["direct"]
+    ANDI:
+        - signature: ["immediate"]
+          opcode:
+              - [0b0101_0100]
+              - ["immediate"]
+    CJNE:
+        - signature: ["register", "immediate", "relative"]
+          opcode:
+              - [1, 0, 1, 1, 1, "r2", "r1", "r0"]
+              - ["immediate"]
+              - ["relative"]
+        # TODO!
+    CLR:
+        - signature: []
+          opcode:
+              - [0b1110_0100]
+
+# TODO: Decide on register definition format.
+# TODO: Should `from` default to `"yay.registers"`? Preference: Yes.
+# TODO: Should it be possible to specify defaults in a `defaults` dict?
+# Preference: Yes.
+# TODO: Should register defs simply be a yaml serialization of the actual
+# register objects? Preference: No, because it harms readability and writability
+# for humans.
+# FIXME: Always comment out!
+# registers:
+#     P1: 0x90
+#     A:
+#         from: "yay.registers"
+#         import: "Accumulator"
+#         call: []
+#     R0:
+#         from: "yay.registers"
+#         import: "Register"
+#         call: [0, true]
+#     R1:
+#         from: "yay.registers"
+#         import: "Register"
+#         call: [1, true]
+#     R2:
+#         from: "yay.registers"
+#         import: "Register"
+#         call: [2]
