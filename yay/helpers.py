@@ -21,8 +21,12 @@ class WrongSignatureException(TypeError):
     pass
 
 
+def config_filename(config_name):
+    return resource_filename("yay", config_name)
+
+
 def read_config(config_name):
-    with open(resource_filename("yay", config_name)) as yaml_file:
+    with open(config_name) as yaml_file:
         return load(yaml_file, Loader=Loader)
 
 

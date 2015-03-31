@@ -1,4 +1,4 @@
-from yay.helpers import read_config, InvalidRegisterError
+from yay.helpers import read_config, config_filename, InvalidRegisterError
 from yay.mnemonics import make_mnemonic
 import yay.registers
 
@@ -18,7 +18,9 @@ def at(register):
 
 
 class AT89S8253:
-    _config = read_config("cpu_configurations/AT89S8253.yml")
+    _config = read_config(
+        config_filename("cpu_configurations/AT89S8253.yml")
+    )
     signature_contents = _config["signature_contents"]
 
     mnemonics = {}
