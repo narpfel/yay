@@ -1,5 +1,5 @@
 from functools import wraps
-from types import FunctionType
+from types import FunctionType, MethodType
 from pkg_resources import resource_filename
 
 from yaml import load
@@ -59,7 +59,12 @@ def inject_names(names):
             closure=f.__closure__
         )
         new_f._initial_globals = f.__globals__
-        return wraps(f)(new_f)
+        new_f = wraps(f)(new_f)
+
+        if hasattr(f, "__self__"):
+            new_f = MethodType(new_f, f.__self__)
+
+        return new_f
     return decorator
 
 
