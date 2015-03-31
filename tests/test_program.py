@@ -129,6 +129,6 @@ def test_self():
             ADD(R3)
             ADD(42)
             with raises(NameError):
-                print(foo)
-            print(self.foo)
+                foo
+            self.foo
     Test().to_binary()
