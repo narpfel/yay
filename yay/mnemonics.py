@@ -120,21 +120,17 @@ def make_mnemonic(name, signatures, signature_contents):
                 )
             )
 
-    @classmethod
-    def bind_target(cls, target):
-        return partial(cls, target=target)
-
-    return type(
-        name,
-        (Mnemonic, ),
-        {"__init__": __init__, "bind_target": bind_target}
-    )
+    return type(name, (Mnemonic, ), {"__init__": __init__})
 
 
 class Mnemonic:
     def __init__(self, target, auto=True):
         if auto:
             target.append(self)
+
+    @classmethod
+    def bind_target(cls, target):
+        return partial(cls, target=target)
 
     @property
     def size(self):
