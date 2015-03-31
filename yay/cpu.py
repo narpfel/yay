@@ -1,6 +1,5 @@
 from yay.helpers import read_config, config_filename, InvalidRegisterError
 from yay.mnemonics import make_mnemonic
-import yay.registers
 
 
 # TODO: Move to a better place (maybe a module that holds all mcs51 specific
@@ -22,6 +21,7 @@ class AT89S8253:
         config_filename("cpu_configurations/AT89S8253.yml")
     )
     signature_contents = _config["signature_contents"]
+    registers = _config["registers"]
 
     mnemonics = {}
     for name, signatures in _config["mnemonics"].items():
@@ -29,8 +29,6 @@ class AT89S8253:
     del name
     del signatures
 
-    registers = yay.registers.AT89S8253.registers
-
     all = dict(mnemonics)
-    all.update(registers)
-    all["at"] = at
+    all.update(_config["registers"])
+    all.update(_config["additional_names"])

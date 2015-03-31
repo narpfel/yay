@@ -2,15 +2,16 @@ import pytest
 from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
-from yay.registers import AT89S8253, IndirectRegister
-from yay.cpu import at
+from yay.registers import IndirectRegister
+from yay.cpu import at, AT89S8253
 
 from yay.helpers import InvalidRegisterError
 
 
-globals().update(AT89S8253._registers)
+# TODO: Dirty hack!
+globals().update(AT89S8253.registers)
 
-# TODO for @A+DPTR
+# TODO for @A+DPTR (also covered by the hack above)
 # DPTR = AT89S8253.DPTR
 # A = AT89S8253.A
 
@@ -31,6 +32,7 @@ def test_matches_args():
         [[R0], ["indirect"], False],
         [[R4], ["indirect"], False],
         [[at(R0)], ["register"], False],
+        [[P1], ["direct"], True],
     ]
     for args, argument_format, expected in tests:
         assert bool(matches_args(args, argument_format)) is expected
