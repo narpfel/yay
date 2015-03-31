@@ -1,6 +1,3 @@
-from yay.helpers import InvalidRegisterError
-
-
 class Accumulator:
     pass
 
@@ -69,15 +66,3 @@ class AT89S8253(metaclass=RegisterDefinitionMeta):
 
     # SFRs
     P1 = 0x90
-
-# TODO: Better place
-def at(register):
-    try:
-        if register.can_indirect:
-            return register.as_indirect
-        else:
-            raise InvalidRegisterError(
-                "{} can not be used as indirect.".format(register)
-            )
-    except AttributeError as err:
-        raise TypeError("Not a register: {!r}.".format(register)) from err

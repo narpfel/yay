@@ -1,6 +1,20 @@
-from yay.helpers import read_config
+from yay.helpers import read_config, InvalidRegisterError
 from yay.mnemonics import make_mnemonic
 import yay.registers
+
+
+# TODO: Move to a better place (maybe a module that holds all mcs51 specific
+# stuff).
+def at(register):
+    try:
+        if register.can_indirect:
+            return register.as_indirect
+        else:
+            raise InvalidRegisterError(
+                "{} can not be used as indirect.".format(register)
+            )
+    except AttributeError as err:
+        raise TypeError("Not a register: {!r}.".format(register)) from err
 
 
 class AT89S8253:
@@ -17,4 +31,4 @@ class AT89S8253:
 
     all = dict(mnemonics)
     all.update(registers)
-    all["at"] = yay.registers.at
+    all["at"] = at

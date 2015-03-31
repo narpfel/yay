@@ -2,7 +2,8 @@ import pytest
 from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
-from yay.registers import AT89S8253, at, IndirectRegister
+from yay.registers import AT89S8253, IndirectRegister
+from yay.cpu import at
 
 from yay.helpers import InvalidRegisterError
 
