@@ -18,7 +18,7 @@ else:
 def test_mnemonics_in_method():
     class Test(Program):
         @macro
-        def add_and(operand):
+        def add_and(self, operand):
             """
             ``@macro``s should just expand to their assembled opcodes where
             they are called. They should provide arguments and lexical scoping,
@@ -30,7 +30,7 @@ def test_mnemonics_in_method():
             AND(operand)
 
         @sub
-        def adda(operand):
+        def adda(self, operand):
             """
             ``@sub``s shall expand to `CALL; {sub}; RET` except they
             end in ``tail_call(sub)`` (or are decorated with ``@tail_call``).
@@ -80,14 +80,14 @@ def test_for_loop():
     class Test(Program):
         @macro
         @contextmanager
-        def loop(register, n):
+        def loop(self, register, n):
             """Actual loop implementation?"""
             MOVI(register, n)
             LABEL("loop_head")
             yield
             DJNZ(register, "loop_head")
 
-        def main():
+        def main(self):
             CLR(A)
             with loop(R7, 5):
                 ADD(R7)
@@ -110,7 +110,7 @@ def test_opcodes_in_class_body():
 
 
     class InMain(Program):
-        def main():
+        def main(self):
             ADD(R2)
 
     assert InBody().to_binary() == InMain().to_binary()
@@ -122,7 +122,6 @@ def test_opcodes_in_class_body_fail():
             ADD(R3)
 
 
-@mark.xfail(reason="TODO: Not implemented yet.")
 def test_self():
     class Test(Program):
         foo = 42

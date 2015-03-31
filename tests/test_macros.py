@@ -12,11 +12,11 @@ def test_xor():
     left, right = A[2], A[4]
 
     class XorTest(Program):
-        def main():
+        def main(self):
             xor(left, right)
 
     class Expected(Program):
-        def main():
+        def main(self):
             LDB(left)
             JNB(right, "dont_toggle")
             CPL(C)
@@ -30,11 +30,11 @@ def test_clear_port():
     port = P1
 
     class ClearPortTest(Program):
-        def main():
+        def main(self):
             clear_port(port=port, bit_mask=bit_mask)
 
     class Expected(Program):
-        def main():
+        def main(self):
             AND(port, bit_mask)
 
     assert ClearPortTest().to_binary() == Expected().to_binary()
@@ -45,11 +45,11 @@ def test_set_port():
     port = P1
 
     class SetPortTest(Program):
-        def main():
+        def main(self):
             set_port(port=port, bit_mask=bit_mask)
 
     class Expected(Program):
-        def main():
+        def main(self):
             OR(port, bit_mask)
 
     assert SetPortTest().to_binary() == Expected().to_binary()
@@ -57,11 +57,11 @@ def test_set_port():
 
 def test_lsl():
     class LslTest(Program):
-        def main():
+        def main(self):
             lsl()
 
     class Expected(Program):
-        def main():
+        def main(self):
             CLR(C)
             RLC()
 
@@ -70,11 +70,11 @@ def test_lsl():
 
 def test_lsr():
     class LsrTest(Program):
-        def main():
+        def main(self):
             lsr()
 
     class Expected(Program):
-        def main():
+        def main(self):
             CLR(C)
             RRC()
 

@@ -10,7 +10,7 @@ pytestmark = mark.xfail(reason="Not implemented yet.")
 @fixture
 def Foo():
     class Foo(_Program, cpu=AT89S8253):
-        def main():
+        def main(self):
             with raises(AttributeError):
                 R0.not_existing_attribute
             R0.not_existing_attribute = 42
@@ -20,7 +20,7 @@ def Foo():
 @fixture
 def Bar():
     class Bar(_Program, cpu=AT89S8253):
-        def main():
+        def main(self):
             with raises(AttributeError):
                 R0.not_existing_attribute
             R0.not_existing_attribute = 42

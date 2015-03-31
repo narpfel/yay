@@ -1,14 +1,6 @@
 TODO
 ====
 
-`Program.main()`
-----------------
-
-Currently, `Program.main()` is required *not* to take `self` as first argument.
-It might be necessary to have access to `self` so it should be possible to
-define `main` with or without `self` as first argument and `Program` (or
-`ProgramMeta`) should handle this correctly.
-
 
 Target handling in mnemonics
 ----------------------------
