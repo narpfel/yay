@@ -49,7 +49,9 @@ def opcode_from_kwargs(opcode_format, kwargs, signature_contents):
 def process_byte(byte_format, kwargs, signature_contents):
     try:
         if len(byte_format) == 1:
-            return try_match_byte(byte_format[0], kwargs)
+            # TODO: Should arguments unconditionally be converted to `int`?
+            # Does this promote subtle bugs in production code?
+            return int(try_match_byte(byte_format[0], kwargs))
         elif len(byte_format) == 8:
             short_to_argname = reverse_dict({
                 # TODO: Better name for `value`.
@@ -84,11 +86,9 @@ def try_match_bit(bit_format, short_to_argname, kwargs):
 
 def try_match_byte(byte_format, kwargs):
     try:
-        # TODO: Should arguments unconditionally be converted to `int`?
-        # Does this promote subtle bugs in production code?
-        return int(kwargs[byte_format])
+        return kwargs[byte_format]
     except KeyError:
-        return int(byte_format)
+        return byte_format
 
 
 def get_bit(number, bit):
