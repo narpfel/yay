@@ -40,6 +40,14 @@ class IndirectRegister:
         return "IR{}()".format(self.indirect_number)
 
 
+class immediate:
+    def __init__(self, immediate):
+        self.immediate = immediate
+
+    def __int__(self):
+        return self.immediate
+
+
 def at(register):
     try:
         if register.can_indirect:

@@ -3,7 +3,7 @@ from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
 from yay.cpu import make_cpu
-from yay.cpus.AT89S8253 import IndirectRegister, at
+from yay.cpus.AT89S8253 import IndirectRegister, at, immediate
 from yay.helpers import InvalidRegisterError
 
 
@@ -34,7 +34,7 @@ def test_matches_args():
         [[P1], ["direct"], True],
     ]
     for args, argument_format, expected in tests:
-        assert bool(matches_args(args, argument_format)) is expected
+        assert bool(matches_args(args, argument_format, False)) is expected
 
 
 def test_at():
@@ -43,6 +43,10 @@ def test_at():
 
     with raises(InvalidRegisterError):
         at(R2)
+
+
+def test_immediate():
+    assert immediate(250).immediate == 250
 
 
 @pytest.mark.xfail(reason="Not implemented yet.")
@@ -61,4 +65,4 @@ def test_matches_kwargs():
     ]
 
     for kwargs, argument_format, expected in tests:
-        assert bool(matches_kwargs(kwargs, argument_format)) is expected
+        assert bool(matches_kwargs(kwargs, argument_format, False)) is expected

@@ -8,17 +8,23 @@ from yay.helpers import (
 )
 
 
-def matches_args(args, argument_format):
+# TODO: Decide whether `forced` should be optional.
+def matches_args(args, argument_format, forced):
     return len(args) == len(argument_format) and all(
-        getattr(match_helpers, "is_{}".format(name))(argument)
+        getattr(
+            match_helpers,
+            "is_{}{}".format("forced_" if forced else "", name)
+        )(argument)
         for name, argument in zip(argument_format, args)
     )
 
 
-def matches_kwargs(kwargs, argument_format):
+# TODO: Decide whether `forced` should be optional.
+def matches_kwargs(kwargs, argument_format, forced):
     return set(kwargs) == set(argument_format) and matches_args(
         [kwargs[argname] for argname in argument_format],
-        argument_format
+        argument_format,
+        forced
     )
 
 
@@ -78,7 +84,9 @@ def try_match_bit(bit_format, short_to_argname, kwargs):
 
 def try_match_byte(byte_format, kwargs):
     try:
-        return kwargs[byte_format]
+        # TODO: Should arguments unconditionally be converted to `int`?
+        # Does this promote subtle bugs in production code?
+        return int(kwargs[byte_format])
     except KeyError:
         return int(byte_format)
 
@@ -102,13 +110,14 @@ def make_mnemonic(name, signatures, signature_contents):
             self.signature = signature
             opcode_format = signature["opcode"]
             argument_format = signature["signature"]
+            forced = signature.get("forced", False)
 
-            if matches_kwargs(kwargs, argument_format):
+            if matches_kwargs(kwargs, argument_format, forced):
                 self.opcode = opcode_from_kwargs(
                     opcode_format, kwargs, signature_contents
                 )
                 break
-            elif matches_args(args, argument_format):
+            elif matches_args(args, argument_format, forced):
                 self.opcode = opcode_from_args(
                     opcode_format, argument_format, args, signature_contents
                 )

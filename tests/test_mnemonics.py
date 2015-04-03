@@ -1,4 +1,4 @@
-from pytest import fixture, raises, mark
+from pytest import raises
 
 from yay.program import Program as _Program
 from yay.helpers import InvalidRegisterError, WrongSignatureException
@@ -23,7 +23,6 @@ def test_insert_in_opcodes():
     assert binary == b"".join([add.opcode, and_.opcode])
 
 
-@mark.xfail(reason="Not implemented yet.")
 def test_immediate():
     class Test(Program):
         def main(self):

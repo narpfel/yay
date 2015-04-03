@@ -24,6 +24,10 @@ def is_immediate(candidate):
     return candidate in range(-128, 256)
 
 
+def is_forced_immediate(candidate):
+    return hasattr(candidate, "immediate") and is_immediate(candidate.immediate)
+
+
 def is_addr11(candidate):
     return candidate in range(2 ** 11)
 

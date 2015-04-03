@@ -32,6 +32,12 @@ mnemonics:
           opcode:
               - ["a10", "a9", "a8", 1, 0, 0, 0, 1]
               - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
+    ADDI:
+        - &ADDI
+          signature: ["immediate"]
+          opcode:
+              - [0b0010_0100]
+              - ["immediate"]
     ADD:
         - signature: ["direct"]
           opcode:
@@ -43,10 +49,13 @@ mnemonics:
         - signature: ["indirect"]
           opcode:
               - [0, 0, 1, 0, 0, 1, 1, "i0"]
-    ADDI:
-        - signature: ["immediate"]
+        - <<: *ADDI
+          forced: true
+    ADDCI:
+        - &ADDCI
+          signature: ["immediate"]
           opcode:
-              - [0b0010_0100]
+              - [0b0011_0100]
               - ["immediate"]
     ADDC:
         - signature: ["direct"]
@@ -59,17 +68,20 @@ mnemonics:
         - signature: ["indirect"]
           opcode:
               - [0, 0, 1, 1, 0, 1, 1, "i0"]
-    ADDCI:
-        - signature: ["immediate"]
-          opcode:
-              - [0b0011_0100]
-              - ["immediate"]
+        - <<: *ADDCI
+          forced: true
     AJMP:
         - signature: ["addr11"]
           opcode:
               - ["a10", "a9", "a8", 0, 0, 0, 0, 1]
               - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
               # alternatively: `- ["low(addr11)"]`‽
+    ANDI:
+        - &ANDI
+          signature: ["immediate"]
+          opcode:
+              - [0b0101_0100]
+              - ["immediate"]
     AND:
         - signature: ["direct"]
           opcode:
@@ -90,11 +102,8 @@ mnemonics:
           opcode:
               - [0b0101_0010]
               - ["direct"]
-    ANDI:
-        - signature: ["immediate"]
-          opcode:
-              - [0b0101_0100]
-              - ["immediate"]
+        - <<: *ANDI
+          forced: true
     CJNE:
         - signature: ["register", "immediate", "relative"]
           opcode:
@@ -179,6 +188,8 @@ registers:
 additional_names:
     at:
         import: "at"
+    immediate:
+        import: "immediate"
 
 importing:
     additional_names: "yay.cpus.AT89S8253"
