@@ -3,13 +3,13 @@ from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
 from yay.registers import IndirectRegister
-from yay.cpu import at, AT89S8253
+from yay.cpu import at, make_cpu
 
 from yay.helpers import InvalidRegisterError
 
 
 # TODO: Dirty hack!
-globals().update(AT89S8253.registers)
+globals().update(make_cpu("AT89S8253")["registers"])
 
 # TODO for @A+DPTR (also covered by the hack above)
 # DPTR = AT89S8253.DPTR

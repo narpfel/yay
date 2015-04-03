@@ -123,6 +123,13 @@ def make_mnemonic(name, signatures, signature_contents):
     return type(name, (Mnemonic, ), {"__init__": __init__})
 
 
+def make_mnemonics(config):
+    return {
+        name: make_mnemonic(name, signatures, config["signature_contents"])
+        for name, signatures in config["mnemonics"].items()
+    }
+
+
 class Mnemonic:
     def __init__(self, target, auto=True):
         if auto:

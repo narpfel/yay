@@ -144,3 +144,8 @@ additional_names:
 importing:
     additional_names: "yay.cpu"
     registers: "yay.registers"
+
+all:
+    - "mnemonics"
+    - "registers"
+    - "additional_names"

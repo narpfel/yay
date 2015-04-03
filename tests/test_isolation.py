@@ -1,15 +1,12 @@
 from pytest import raises, fixture, importorskip, mark
 
 from yay.program import _Program
-from yay.cpu import AT89S8253
-
-
-pytestmark = mark.xfail(reason="Not implemented yet.")
+from yay.cpu import make_cpu
 
 
 @fixture
 def Foo():
-    class Foo(_Program, cpu=AT89S8253):
+    class Foo(_Program, cpu="AT89S8253"):
         def main(self):
             with raises(AttributeError):
                 R0.not_existing_attribute
@@ -19,7 +16,7 @@ def Foo():
 
 @fixture
 def Bar():
-    class Bar(_Program, cpu=AT89S8253):
+    class Bar(_Program, cpu="AT89S8253"):
         def main(self):
             with raises(AttributeError):
                 R0.not_existing_attribute
@@ -34,6 +31,7 @@ def Baz(Foo):
     return Baz
 
 
+@mark.xfail(reason="TODO: Decide whether this should fail. Preference: Yes.")
 def test_multiple_to_binary_call(Foo):
     foo = Foo()
     foo.to_binary()
@@ -58,4 +56,4 @@ def test_inherited_classes_are_isolated(Foo, Baz):
 def test_cpu_unaffected(Foo):
     Foo().to_binary()
     with raises(AttributeError):
-        AT89S8253.registers["R0"].not_existing_attribute
+        make_cpu("AT89S8253")["registers"]["R0"].not_existing_attribute

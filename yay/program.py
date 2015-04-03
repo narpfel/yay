@@ -1,7 +1,7 @@
 from contextlib import suppress
 
-import yay.cpu
 from yay.helpers import inject_names
+from yay.cpu import make_cpu
 
 
 class ProgramMeta(type):
@@ -11,7 +11,7 @@ class ProgramMeta(type):
     def __init__(self, name, bases, namespace, **kwargs):
         type.__init__(self, name, bases, namespace)
         with suppress(KeyError):
-            self._cpu = kwargs["cpu"]
+            self._cpu_spec = kwargs["cpu"]
         self._opcode_destination = kwargs.get("opcode_destination", list)
 
 
@@ -19,12 +19,14 @@ class ProgramMeta(type):
 class _Program(metaclass=ProgramMeta):
     def __init__(self):
         self._opcodes = self._opcode_destination()
+        cpu = make_cpu(self._cpu_spec)
         self._cpu_namespace = {}
-        for name, item in self._cpu.all.items():
-            try:
-                self._cpu_namespace[name] = item.bind_target(self._opcodes)
-            except AttributeError:
-                self._cpu_namespace[name] = item
+        for section_name in cpu["all"]:
+            for name, item in cpu[section_name].items():
+                try:
+                    self._cpu_namespace[name] = item.bind_target(self._opcodes)
+                except AttributeError:
+                    self._cpu_namespace[name] = item
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
 
@@ -34,5 +36,5 @@ class _Program(metaclass=ProgramMeta):
         return b"".join(opcode.opcode for opcode in self._opcodes)
 
 
-class Program(_Program, cpu=yay.cpu.AT89S8253):
+class Program(_Program, cpu="AT89S8253"):
     pass
