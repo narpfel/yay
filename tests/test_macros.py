@@ -7,6 +7,12 @@ from yay.macros import xor, clear_port, set_port, lsl, lsr
 from yay.registers import AT89S8253
 globals().update(AT89S8253.registers)
 
+from yay.program import Program as _Program
+
+
+class Program(_Program, cpu="AT89S8253"):
+    pass
+
 
 def test_xor():
     left, right = A[2], A[4]

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 requirements = [
     "setuptools",
@@ -9,9 +9,7 @@ requirements = [
 
 setup(
     name='yay',
-    packages=[
-        'yay',
-    ],
+    packages=find_packages(),
     package_dir={'yay': 'yay'},
     include_package_data=True,
     package_data={

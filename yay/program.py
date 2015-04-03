@@ -15,8 +15,7 @@ class ProgramMeta(type):
         self._opcode_destination = kwargs.get("opcode_destination", list)
 
 
-# TODO: dirty, remove leading underscore and make “real” CPU specific classes.
-class _Program(metaclass=ProgramMeta):
+class Program(metaclass=ProgramMeta):
     def __init__(self):
         self._opcodes = self._opcode_destination()
         cpu = make_cpu(self._cpu_spec)
@@ -34,7 +33,3 @@ class _Program(metaclass=ProgramMeta):
     def to_binary(self):
         self.main()
         return b"".join(opcode.opcode for opcode in self._opcodes)
-
-
-class Program(_Program, cpu="AT89S8253"):
-    pass

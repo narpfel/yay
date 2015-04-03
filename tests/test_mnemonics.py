@@ -1,7 +1,11 @@
 from pytest import fixture, raises, mark
 
-from yay.program import Program, ProgramMeta
+from yay.program import Program as _Program
 from yay.helpers import InvalidRegisterError, WrongSignatureException
+
+
+class Program(_Program, cpu="AT89S8253"):
+    pass
 
 
 def test_insert_in_opcodes():

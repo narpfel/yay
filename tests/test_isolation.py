@@ -1,12 +1,12 @@
 from pytest import raises, fixture, importorskip, mark
 
-from yay.program import _Program
+from yay.program import Program
 from yay.cpu import make_cpu
 
 
 @fixture
 def Foo():
-    class Foo(_Program, cpu="AT89S8253"):
+    class Foo(Program, cpu="AT89S8253"):
         def main(self):
             with raises(AttributeError):
                 R0.not_existing_attribute
@@ -16,7 +16,7 @@ def Foo():
 
 @fixture
 def Bar():
-    class Bar(_Program, cpu="AT89S8253"):
+    class Bar(Program, cpu="AT89S8253"):
         def main(self):
             with raises(AttributeError):
                 R0.not_existing_attribute

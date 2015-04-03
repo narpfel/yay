@@ -142,8 +142,8 @@ additional_names:
         import: "at"
 
 importing:
-    additional_names: "yay.cpu"
-    registers: "yay.registers"
+    additional_names: "yay.cpus.AT89S8253"
+    registers: "yay.cpus.AT89S8253"
 
 all:
     - "mnemonics"

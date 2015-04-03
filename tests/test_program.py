@@ -2,7 +2,12 @@ from contextlib import contextmanager
 
 from pytest import raises, mark
 
-from yay.program import Program
+from yay.program import Program as _Program
+
+
+class Program(_Program, cpu="AT89S8253"):
+    pass
+
 
 try:
     class Test(Program):
