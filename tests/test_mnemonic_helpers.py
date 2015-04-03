@@ -39,8 +39,7 @@ def test_matches_args():
 
 
 def test_at():
-    assert at(R0).number == 0
-    assert at(R0).indirect is True
+    assert at(R0).indirect_number == 0
     assert at(at(R0)) is at(R0)
 
     with raises(InvalidRegisterError):

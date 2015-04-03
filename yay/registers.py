@@ -21,15 +21,17 @@ class Register:
         return "R{}()".format(self.number)
 
 
-class IndirectRegister(Register):
-    def __init__(self, number, can_indirect=True):
-        super().__init__(number, False)
+class IndirectRegister:
+    def __init__(self, number):
+        self.indirect_number = number
         self.can_indirect = True
         self.as_indirect = self
-        self.indirect = True
+
+    def __int__(self):
+        return self.indirect_number
 
     def __str__(self):
-        return "IR{}".format(self.number)
+        return "IR{}".format(self.indirect_number)
 
     def __repr__(self):
-        return "IR{}()".format(self.number)
+        return "IR{}()".format(self.indirect_number)

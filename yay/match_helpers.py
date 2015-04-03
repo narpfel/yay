@@ -2,7 +2,7 @@ from yay.registers import Accumulator
 
 
 def is_register(candidate):
-    return hasattr(candidate, "number") and not is_indirect(candidate)
+    return hasattr(candidate, "number")
 
 
 def is_direct(candidate):
@@ -10,11 +10,7 @@ def is_direct(candidate):
 
 
 def is_indirect(candidate):
-    return (
-        hasattr(candidate, "number")
-        and hasattr(candidate, "indirect")
-        and candidate.indirect
-    )
+    return hasattr(candidate, "indirect_number")
 
 
 def is_immediate(candidate):
