@@ -16,25 +16,6 @@ be easily replaced for all mnemonics.
 To assist [TODO: ???]
 
 
-CPU definitions
----------------
-
-A CPU definition should be completely contained in one yaml config file.
-There should be a function `read_cpu_definition` (?) that takes a CPU name and
-returns a dictionary representing the specified CPU. It should be possible to
-use this return value as the `cpu` argument for `Program` subclasses.
-
-
-Config files in data directories
---------------------------------
-
-Move all config files to `yay/configurations` and load them via `pkg_resources`.
-Implement function `yay.get_cpu` that either takes a predefined CPU name and
-loads that CPU definition via `pkg_resources` or a `pathlib.Path` instance
-and loads the config file from that path. Maybe for predefined CPUs there
-should be an importable name in `yay.cpu`.
-
-
 `LD` mnemonic
 -------------
 
@@ -44,17 +25,6 @@ cannot be used anymore because they encode their argument type in their names.
 Introducing a polymorphic mnmonic `LD` will solve this problem. It should
 be made clear that in situations when the argument type is known at write
 time, for clarity reasons the specialized `LDA`, `LDD` and `LDI` are preferred.
-
-
-Isolation
----------
-
-All tests `tests/test_isolation.py` should pass. Solution: On instantiation of
-`_Program`, `_Program.__init__()` should use the configuration dict to create
-a new set of CPU specific objects.
-
-For that, the `cpu` keyword argument should accept a string that is interpreted
-as the config file location. See “Config files in data directories”.
 
 
 `immediate` function
