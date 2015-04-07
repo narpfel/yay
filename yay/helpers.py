@@ -1,6 +1,5 @@
 from functools import wraps
 from types import FunctionType, MethodType
-from importlib import import_module
 from pkg_resources import resource_filename
 
 from yaml import load
@@ -26,42 +25,9 @@ def config_filename(config_name):
     return resource_filename("yay", config_name)
 
 
-def _insert_default_from(import_spec, default_from):
-    if "from" not in import_spec:
-        import_spec["from"] = default_from
-
-
-def _import_object(from_, name):
-    return getattr(import_module(from_), name)
-
-
-def _read_import_spec(import_spec, default_from):
-    try:
-        import_spec["import"]
-    except (KeyError, TypeError):
-        # Not a valid `import_spec`, ignoring.
-        return import_spec
-    _insert_default_from(import_spec, default_from)
-    imported = _import_object(import_spec["from"], import_spec["import"])
-    if "call" in import_spec:
-        return imported(*import_spec["call"])
-    else:
-        return imported
-
-
-def _replace_imports(section, default_from):
-    for name, import_spec in section.items():
-        section[name] = _read_import_spec(import_spec, default_from)
-
-
 def read_config(config_name):
     with open(config_name) as yaml_file:
-        config = load(yaml_file, Loader=Loader)
-
-    for name, default in config.pop("importing", {}).items():
-        _replace_imports(config[name], default)
-
-    return config
+        return load(yaml_file, Loader=Loader)
 
 
 def reverse_dict(mapping):

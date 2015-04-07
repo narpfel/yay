@@ -1,7 +1,4 @@
 from textwrap import dedent
-import functools
-import itertools
-import decimal
 
 from pytest import raises
 
@@ -35,61 +32,3 @@ def test_read_config(tmpdir):
         """
     ))
     assert read_config(test_yml.strpath) == {"test_key": "test_value"}
-
-
-def test_read_config_import(tmpdir):
-    test_yml = tmpdir.join("test.yml")
-    test_yml.write(dedent(
-        """
-        foo:
-            bar:
-                from: "functools"
-                import: "wraps"
-            baz:
-                from: "decimal"
-                import: "Decimal"
-                call: [42]
-            test:
-                import: "count"
-            parrot: 42
-        bar:
-            answer:
-                import: "add"
-                call: [20, 22]
-            spam:
-                import: "mul"
-                call: ["a", 42]
-            parrot: "foo"
-        without_imports:
-            answer: 42
-            spam: "parrot"
-            parrot:
-                from: "itertools"
-                import: "chain"
-        importing:
-            foo: "itertools"
-            bar: "operator"
-        """
-    ))
-
-    assert read_config(test_yml.strpath) == {
-        "foo": {
-            "bar": functools.wraps,
-            "baz": decimal.Decimal(42),
-            "test": itertools.count,
-            "parrot": 42,
-        },
-        "bar": {
-            "answer": 42,
-            "spam": "a" * 42,
-            "parrot": "foo",
-        },
-        "without_imports": {
-            "answer": 42,
-            "spam": "parrot",
-            "parrot": {
-                "from": "itertools",
-                "import": "chain",
-            },
-        }
-    }
