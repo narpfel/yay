@@ -5,7 +5,7 @@
 # collisions would be possible.
 # Preference: Yes.
 
-from yay.cpus.AT89S8253 import Accumulator
+from yay.cpus.MCS_51 import Accumulator
 
 
 def is_register(candidate):

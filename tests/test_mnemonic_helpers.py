@@ -3,7 +3,7 @@ from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
 from yay.cpu import make_cpu
-from yay.cpus.AT89S8253 import IndirectRegister, at, immediate
+from yay.cpus.MCS_51 import IndirectRegister, at, immediate
 from yay.helpers import InvalidRegisterError
 
 

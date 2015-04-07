@@ -1,0 +1,201 @@
+# TODO: Better name for `signature_contents`.
+# TODO: Should there be the ability to specify valid values? Pro: More
+# information in config file rather than in code. Con: How to specify complex
+# values such as `Register` objects or (esp. for `direct`) the possibility for
+# both integers *and* register objects?
+signature_contents:
+    direct:
+        length: 8
+        short: null
+    register:
+        length: 3
+        short: "r"
+    indirect:
+        length: 1
+        short: "i"
+    immediate:
+        legnth: 8
+        short: null
+    relative:
+        length: 8
+        short: null
+    addr11:
+        length: 11
+        short: "a"
+    accu:
+        length: 0
+        short: null
+    # And so on...
+mnemonics:
+    ACALL:
+        - signature: ["addr11"]
+          opcode:
+              - ["a10", "a9", "a8", 1, 0, 0, 0, 1]
+              - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
+    ADDI:
+        - &ADDI
+          signature: ["immediate"]
+          opcode:
+              - [0b0010_0100]
+              - ["immediate"]
+    ADD:
+        - signature: ["direct"]
+          opcode:
+              - [0b0010_0101]
+              - ["direct"]
+        - signature: ["register"]
+          opcode:
+              - [0, 0, 1, 0, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 0, 1, 0, 0, 1, 1, "i0"]
+        - <<: *ADDI
+          forced: true
+    ADDCI:
+        - &ADDCI
+          signature: ["immediate"]
+          opcode:
+              - [0b0011_0100]
+              - ["immediate"]
+    ADDC:
+        - signature: ["direct"]
+          opcode:
+              - [0b0011_0101]
+              - ["direct"]
+        - signature: ["register"]
+          opcode:
+              - [0, 0, 1, 1, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 0, 1, 1, 0, 1, 1, "i0"]
+        - <<: *ADDCI
+          forced: true
+    AJMP:
+        - signature: ["addr11"]
+          opcode:
+              - ["a10", "a9", "a8", 0, 0, 0, 0, 1]
+              - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
+              # alternatively: `- ["low(addr11)"]`‽
+    ANDI:
+        - &ANDI
+          signature: ["immediate"]
+          opcode:
+              - [0b0101_0100]
+              - ["immediate"]
+    AND:
+        - signature: ["direct"]
+          opcode:
+              - [0b0101_0101]
+              - ["direct"]
+        - signature: ["register"]
+          opcode:
+              - [0, 1, 0, 1, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 1, 0, 1, 0, 1, 1, "i0"]
+        - signature: ["direct", "immediate"]
+          opcode:
+              - [0b0101_0011]
+              - ["direct"]
+              - ["immediate"]
+        - signature: ["direct", "accu"]
+          opcode:
+              - [0b0101_0010]
+              - ["direct"]
+        - <<: *ANDI
+          forced: true
+    CJNE:
+        - signature: ["register", "immediate", "relative"]
+          opcode:
+              - [1, 0, 1, 1, 1, "r2", "r1", "r0"]
+              - ["immediate"]
+              - ["relative"]
+        # TODO!
+    CLR:
+        - signature: []
+          opcode:
+              - [0b1110_0100]
+
+registers:
+    P0: 0x80
+    SP: 0x81
+    DP0L: 0x82
+    DP0H: 0x83
+    DP1L: 0x84
+    DP1H: 0x85
+    SPDR: 0x86
+    PCON: 0x87
+    TCON: 0x88
+    TMOD: 0x89
+    TL0: 0x8A
+    TL1: 0x8B
+    TH0: 0x8C
+    TH1: 0x8D
+    AUXR: 0x8E
+    CLKREG: 0x8F
+    P1: 0x90
+    EECON: 0x96
+    SCON: 0x98
+    SBUF: 0x99
+    P2: 0xA0
+    WDTRST: 0xA6
+    WDTCON: 0xA7
+    IE: 0xA8
+    SADDR: 0xA9
+    SPSR: 0xAA
+    P3: 0xB0
+    IPH: 0xB7
+    IP: 0xB8
+    SADEN: 0xB9
+    T2CON: 0xC8
+    T2MOD: 0xC9
+    RCAP2L: 0xCA
+    RCAP2H: 0xCB
+    TL2: 0xCC
+    TH2: 0xCD
+    PSW: 0xD0
+    SPCR: 0xD5
+    ACC: 0xE0
+    B: 0xF0
+    A:
+        import: "Accumulator"
+        call: []
+    R0:
+        import: "Register"
+        call: [0, true]
+    R1:
+        import: "Register"
+        call: [1, true]
+    R2:
+        import: "Register"
+        call: [2]
+    R3:
+        import: "Register"
+        call: [3]
+    R4:
+        import: "Register"
+        call: [4]
+    R5:
+        import: "Register"
+        call: [5]
+    R6:
+        import: "Register"
+        call: [6]
+    R7:
+        import: "Register"
+        call: [7]
+
+additional_names:
+    at:
+        import: "at"
+    immediate:
+        import: "immediate"
+
+importing:
+    additional_names: "yay.cpus.MCS_51"
+    registers: "yay.cpus.MCS_51"
+
+all:
+    - "mnemonics"
+    - "registers"
+    - "additional_names"
