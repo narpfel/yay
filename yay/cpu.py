@@ -2,7 +2,7 @@ import os.path
 from pathlib import Path
 from importlib import import_module
 
-from yay.helpers import read_config, config_filename
+from yay.helpers import read_config, config_filename, recursive_merge
 from yay.mnemonics import make_mnemonics
 
 
@@ -36,6 +36,12 @@ def _replace_imports(section, default_from):
 
 def read_cpu_config(config_name):
     config = read_config(config_name)
+
+    if "inherit_from" in config:
+        config = recursive_merge(
+            read_cpu_config(get_cpu_definition(config["inherit_from"])),
+            config
+        )
 
     for name, default in config.pop("importing", {}).items():
         _replace_imports(config[name], default)

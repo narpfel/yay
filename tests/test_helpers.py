@@ -2,7 +2,10 @@ from textwrap import dedent
 
 from pytest import raises
 
-from yay.helpers import reverse_dict, twos_complement, read_config
+from yay.helpers import (
+    reverse_dict, twos_complement, read_config, recursive_merge
+)
+
 
 
 def test_reverse_dict():
@@ -32,3 +35,38 @@ def test_read_config(tmpdir):
         """
     ))
     assert read_config(test_yml.strpath) == {"test_key": "test_value"}
+
+
+def test_recursive_merge():
+    assert recursive_merge({
+        "foo": "bar",
+        "parrot": {
+            "spam": 7,
+            "cheese": {
+                "foo": 42,
+                "bar": 7
+            }
+        },
+        "not_updated": 22
+    }, {
+        "foo": "spam",
+        "parrot": {
+            "cheese": {
+                "bar": 42,
+                "yummy": "ham and eggs"
+            },
+            42: 7
+        }
+    }) == {
+        "foo": "spam",
+        "parrot": {
+            "spam": 7,
+            "cheese": {
+                "foo": 42,
+                "bar": 42,
+                "yummy": "ham and eggs"
+            },
+            42: 7
+        },
+        "not_updated": 22
+    }

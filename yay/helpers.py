@@ -1,5 +1,6 @@
 from functools import wraps
 from types import FunctionType, MethodType
+from collections.abc import MutableMapping
 from pkg_resources import resource_filename
 
 from yaml import load
@@ -34,6 +35,19 @@ def reverse_dict(mapping):
     if len(set(mapping)) != len(set(mapping.values())):
         raise ValueError("Mapping values not unique.")
     return {value: key for key, value in mapping.items()}
+
+
+def recursive_merge(base, update):
+    if not (
+        isinstance(base, MutableMapping) and isinstance(update, MutableMapping)
+    ):
+        return update
+
+    merged = dict(base)
+    merged.update(update)
+    for key in set(base) & set(update):
+        merged[key] = recursive_merge(base[key], update[key])
+    return merged
 
 
 def twos_complement(number, bits, ranged=True):
