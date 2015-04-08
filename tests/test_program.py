@@ -137,3 +137,13 @@ def test_self():
                 foo
             self.foo
     Test().to_binary()
+
+
+def test_missing_self_fails():
+    class Test(Program):
+        def main():
+            pass
+    test = Test()
+
+    with raises(TypeError):
+        test.to_binary()
