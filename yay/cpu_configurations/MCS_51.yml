@@ -14,7 +14,7 @@ signature_contents:
         length: 1
         short: "i"
     immediate:
-        legnth: 8
+        length: 8
         short: null
     relative:
         length: 8
