@@ -65,10 +65,7 @@ def twos_complement(number, bits, ranged=True):
 def inject_names(names):
     def decorator(f):
         f_globals = dict(names)
-        try:
-            f_globals.update(f._initial_globals)
-        except AttributeError:
-            f_globals.update(f.__globals__)
+        f_globals.update(getattr(f, "_initial_globals", f.__globals__))
 
         new_f = FunctionType(
             f.__code__,
