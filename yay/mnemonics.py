@@ -117,7 +117,7 @@ def make_mnemonic(name, signatures, signature_contents):
             argument_format = signature["signature"]
             forced = signature.get("forced", False)
 
-            if matches_kwargs(kwargs, argument_format, forced):
+            if argument_format and matches_kwargs(kwargs, argument_format, forced):
                 self.opcode = opcode_from_kwargs(
                     opcode_format, kwargs, signature_contents
                 )
