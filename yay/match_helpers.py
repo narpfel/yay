@@ -6,7 +6,7 @@
 # Preference: Yes.
 
 from yay.cpus.MCS_51 import (
-    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset
+    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset, Carry
 )
 
 
@@ -50,3 +50,15 @@ def is_dptr_offset(candidate):
 
 def is_pc_offset(candidate):
     return isinstance(candidate, PcOffset)
+
+
+def is_carry(candidate):
+    return isinstance(candidate, Carry)
+
+
+def is_bit(candidate):
+    return hasattr(candidate, "bit_addr") and candidate.bit_addr in range(256)
+
+
+def is_not_bit(candidate):
+    return hasattr(candidate, "not_bit_addr") and candidate.not_bit_addr in range(256)

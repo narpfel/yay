@@ -32,6 +32,10 @@ class IndirectDptr:
     pass
 
 
+class Carry:
+    pass
+
+
 class Register:
     def __init__(self, number, can_indirect=False):
         self.number = number
@@ -85,6 +89,25 @@ class SFR(Byte):
 
     def __str__(self):
         return self.name
+
+
+class Bit:
+    def __init__(self, bit_addr):
+        self.bit_addr = bit_addr
+
+    def __invert__(self):
+        return NotBit(self.bit_addr)
+
+    def __int__(self):
+        return self.bit_addr
+
+
+class NotBit:
+    def __init__(self, not_bit_addr):
+        self.not_bit_addr = not_bit_addr
+
+    def __int__(self):
+        return self.not_bit_addr
 
 
 def at(register):

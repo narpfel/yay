@@ -39,6 +39,15 @@ signature_contents:
     pc_offset:
         length: 0
         short: null
+    carry:
+        length: 0
+        short: null
+    bit:
+        length: 8
+        short: null
+    not_bit:
+        length: 8
+        short: null
     # And so on...
 mnemonics:
     ACALL:
@@ -242,6 +251,9 @@ registers:
     A:
         import: "Accumulator"
         call: []
+    C:
+        import: "Carry"
+        call: []
     R0:
         import: "Register"
         call: [0, true]
@@ -278,6 +290,8 @@ additional_names:
         import: "at"
     Byte:
         import: "Byte"
+    Bit:
+        import: "Bit"
 
 importing:
     additional_names: "yay.cpus.MCS_51"
