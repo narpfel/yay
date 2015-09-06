@@ -6,23 +6,18 @@ from yay.helpers import read_config, config_filename, recursive_merge
 from yay.mnemonics import make_mnemonics
 
 
-def _insert_default_from(import_spec, default_from):
-    if "from" not in import_spec:
-        import_spec["from"] = default_from
-
-
 def _import_object(from_, name):
     return getattr(import_module(from_), name)
 
 
 def _read_import_spec(import_spec, default_from):
     try:
-        import_spec["import"]
+        name = import_spec["import"]
     except (KeyError, TypeError):
         # Not a valid `import_spec`, ignoring.
         return import_spec
-    _insert_default_from(import_spec, default_from)
-    imported = _import_object(import_spec["from"], import_spec["import"])
+    from_ = import_spec.get("from", default_from)
+    imported = _import_object(from_, name)
     if "call" in import_spec:
         return imported(*import_spec["call"])
     else:
