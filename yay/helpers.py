@@ -53,10 +53,10 @@ def recursive_merge(base, update):
 def twos_complement(number, bits, ranged=True):
     """Normalize negative values to their two’s complement values.
 
-    Positive values are left unchanged, if they are in ``range(2**bits)``,
+    Positive values are left unchanged if they are in ``range(2**bits)``,
     otherwise the last `bits` bits of them are taken.
     """
-    allowed_values = range(-2**(bits - 1), 2**bits - 1)
+    allowed_values = range(-2**(bits - 1), 2**bits)
     if ranged and number not in allowed_values:
         raise ValueError("`number` not in `{}`".format(allowed_values))
     return number & (2 ** bits - 1)
