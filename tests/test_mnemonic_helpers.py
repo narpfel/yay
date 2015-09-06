@@ -3,7 +3,7 @@ from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
 from yay.cpu import make_cpu
-from yay.cpus.MCS_51 import IndirectRegister, Byte, at
+from yay.cpus.MCS_51 import IndirectRegister, Byte, at, DptrOffset
 from yay.helpers import InvalidRegisterError
 
 
@@ -49,9 +49,8 @@ def test_at():
         at(R2)
 
 
-@pytest.mark.xfail(reason="Not implemented yet.")
 def test_at_DPTR():
-    assert at(A + DPTR).indirect is True
+    assert isinstance(at(A + DPTR), DptrOffset)
 
 
 def test_matches_kwargs():

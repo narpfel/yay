@@ -5,7 +5,9 @@
 # collisions would be possible.
 # Preference: Yes.
 
-from yay.cpus.MCS_51 import Accumulator
+from yay.cpus.MCS_51 import (
+    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset
+)
 
 
 def is_direct(candidate):
@@ -32,3 +34,19 @@ def is_addr11(candidate):
 
 def is_accu(candidate):
     return isinstance(candidate, Accumulator)
+
+
+def is_dptr(candidate):
+    return isinstance(candidate, DPTR)
+
+
+def is_indirect_dptr(candidate):
+    return isinstance(candidate, IndirectDptr)
+
+
+def is_dptr_offset(candidate):
+    return isinstance(candidate, DptrOffset)
+
+
+def is_pc_offset(candidate):
+    return isinstance(candidate, PcOffset)

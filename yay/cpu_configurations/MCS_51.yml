@@ -25,6 +25,20 @@ signature_contents:
     accu:
         length: 0
         short: null
+    dptr:
+        length: 0
+        short: null
+    indirect_dptr:
+        length: 0
+        short: null
+    # The result of `at(A + DPTR)`
+    dptr_offset:
+        length: 0
+        short: null
+    # The result of `at(A + PC)`
+    pc_offset:
+        length: 0
+        short: null
     # And so on...
 mnemonics:
     ACALL:
@@ -252,6 +266,12 @@ registers:
     R7:
         import: "Register"
         call: [7]
+    DPTR:
+        import: "DPTR"
+        call: []
+    PC:
+        import: "PC"
+        call: []
 
 additional_names:
     at:

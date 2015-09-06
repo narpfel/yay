@@ -2,6 +2,33 @@ from yay.helpers import InvalidRegisterError
 
 
 class Accumulator:
+    def __add__(self, other):
+        if isinstance(other, DPTR):
+            return DptrOffset()
+        elif isinstance(other, PC):
+            return PcOffset()
+        raise NotImplemented
+
+
+class DPTR:
+    def __init__(self):
+        self.can_indirect = True
+        self.as_indirect = IndirectDptr()
+
+
+class PC:
+    pass
+
+
+class DptrOffset:
+    pass
+
+
+class PcOffset:
+    pass
+
+
+class IndirectDptr:
     pass
 
 
@@ -61,6 +88,9 @@ class SFR(Byte):
 
 
 def at(register):
+    if isinstance(register, (DptrOffset, PcOffset)):
+        return register
+
     try:
         if register.can_indirect:
             return register.as_indirect
