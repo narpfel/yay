@@ -180,3 +180,21 @@ def test_CLR_A():
         def main(self):
             CLR()
     assert Test().to_binary() == bytes([0b11100100])
+
+
+def test_INC():
+    class Test(Program):
+        def main(self):
+            INC()
+            INC(R7)
+            INC(Byte(42))
+            INC(at(R0))
+            INC(DPTR)
+    assert Test().to_binary() == bytes([
+        0b00000100,
+        0b00001111,
+        0b00000101,
+        42,
+        0b00000110,
+        0b10100011
+    ])

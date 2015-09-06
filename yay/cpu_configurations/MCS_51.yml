@@ -16,12 +16,18 @@ signature_contents:
     immediate:
         length: 8
         short: null
+    immediate16:
+        length: 16
+        short: "s"
     relative:
         length: 8
         short: null
     addr11:
         length: 11
         short: "a"
+    addr16:
+        length: 16
+        short: "l"
     accu:
         length: 0
         short: null
@@ -115,17 +121,408 @@ mnemonics:
           opcode:
             - [0b0101_0100]
             - ["immediate"]
+        - signature: ["bit"]
+          opcode:
+              - [0b1000_0010]
+              - ["bit"]
+        - signature: ["not_bit"]
+          opcode:
+              - [0b1011_0000]
+              - ["not_bit"]
     CJNE:
+        - signature: ["accu", "direct", "relative"]
+          opcode:
+              - [0b1011_0101]
+              - ["direct"]
+              - ["relative"]
+        - signature: ["accu", "immediate", "relative"]
+          opcode:
+              - [0b1011_0100]
+              - ["immediate"]
+              - ["relative"]
         - signature: ["register", "immediate", "relative"]
           opcode:
               - [1, 0, 1, 1, 1, "r2", "r1", "r0"]
               - ["immediate"]
               - ["relative"]
-        # TODO!
+        - signature: ["indirect", "immediate", "relative"]
+          opcode:
+              - [1, 0, 1, 1, 0, 1, 1, "i0"]
+              - ["immediate"]
+              - ["relative"]
     CLR:
         - signature: []
           opcode:
               - [0b1110_0100]
+        - signature: ["carry"]
+          opcode:
+              - [0b1100_0011]
+        - signature: ["bit"]
+          opcode:
+              - [0b1100_0010]
+              - ["bit"]
+    CPL:
+        - signature: []
+          opcode:
+              - [0b1111_0100]
+        - signature: ["carry"]
+          opcode:
+              - [0b1011_0011]
+        - signature: ["bit"]
+          opcode:
+              - [0b1011_0010]
+              - ["bit"]
+    DA:
+        - signature: []
+          opcode:
+              - [0b1101_0100]
+    DEC:
+        - signature: []
+          opcode:
+              - [0b0001_0100]
+        - signature: ["register"]
+          opcode:
+              - [0, 0, 0, 1, 1, "r2", "r1", "r0"]
+        - signature: ["direct"]
+          opcode:
+              - [0b0001_0101]
+              - ["direct"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 0, 0, 1, 0, 1, 1, "i0"]
+    DIV:
+        - signature: []
+          opcode:
+              - [0b1000_0100]
+    DJNZ:
+        - signature: ["register", "relative"]
+          opcode:
+              - [1, 1, 0, 1, 1, "r2", "r1", "r0"]
+              - ["relative"]
+        - signature: ["direct", "relative"]
+          opcode:
+              - [0b1101_0101]
+              - ["direct"]
+              - ["relative"]
+    INC:
+        - signature: []
+          opcode:
+              - [0b0000_0100]
+        - signature: ["register"]
+          opcode:
+              - [0, 0, 0, 0, 1, "r2", "r1", "r0"]
+        - signature: ["direct"]
+          opcode:
+              - [0b0000_0101]
+              - ["direct"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 0, 0, 0, 0, 1, 1, "i0"]
+        - signature: ["dptr"]
+          opcode:
+              - [0b1010_0011]
+    JB:
+        - signature: ["bit", "relative"]
+          opcode:
+              - [0b0010_0000]
+              - ["bit"]
+              - ["relative"]
+    JBC:
+        - signature: ["bit", "relative"]
+          opcode:
+              - [0b0001_0000]
+              - ["bit"]
+              - ["relative"]
+    JC:
+        - signature: ["relative"]
+          opcode:
+              - [0b0100_0000]
+              - ["relative"]
+    # TODO: JMP(at(A + DPTR))
+    JMP:
+        - signature: ["dptr_offset"]
+          opcode:
+              - [0b0111_0011]
+    JNB:
+        - signature: ["bit", "relative"]
+          opcode:
+              - [0b0011_0000]
+              - ["bit"]
+              - ["relative"]
+    JNC:
+        - signature: ["relative"]
+          opcode:
+              - [0b0101_0000]
+              - ["relative"]
+    JNZ:
+        - signature: ["relative"]
+          opcode:
+              - [0b0111_0000]
+              - ["relative"]
+    JZ:
+        - signature: ["relative"]
+          opcode:
+              - [0b0110_0000]
+              - ["relative"]
+    LCALL:
+        - signature: ["addr16"]
+          opcode:
+              - [0b0001_0010]
+              - ["l15", "l14", "l13", "l12", "l11", "l10", "l9", "l8"]
+              - ["l7", "l6", "l5", "l4", "l3", "l2", "l1", "l0"]
+    LJMP:
+        - signature: ["addr16"]
+          opcode:
+              - [0b0000_0010]
+              - ["l15", "l14", "l13", "l12", "l11", "l10", "l9", "l8"]
+              - ["l7", "l6", "l5", "l4", "l3", "l2", "l1", "l0"]
+    LDR:
+        - signature: ["register"]
+          opcode:
+              - [1, 1, 1, 0, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [1, 1, 1, 0, 0, 1, 1, "i0"]
+    LDD:
+        - signature: ["direct"]
+          opcode:
+              - [0b1110_0101]
+              - ["direct"]
+    LDI:
+        - signature: ["immediate"]
+          opcode:
+              - [0b0111_0100]
+              - ["immediate"]
+    STR:
+        - signature: ["register"]
+          opcode:
+              - [1, 1, 1, 1, 1, "r2", "r1", "r0"]
+        - signature: ["indirect"]
+          opcode:
+              - [1, 1, 1, 1, 0, 1, 1, "i0"]
+    MOV:
+        - signature: ["register", "direct"]
+          opcode:
+              - [1, 0, 1, 0, 1, "r2", "r1", "r0"]
+              - ["direct"]
+        - signature: ["direct", "register"]
+          opcode:
+              - [1, 0, 0, 0, 1, "r2", "r1", "r0"]
+              - ["direct"]
+        # TODO: `MOV(direct, direct)` is impossible.
+        # Maybe use `direct_dest` as an ugly hack:
+        - signature: ["direct", "direct_dest"]
+          opcode:
+              - [0b1000_0101]
+              - ["direct"]
+              - ["direct_dest"]
+        - signature: ["direct", "indirect"]
+          opcode:
+              - [1, 0, 0, 0, 0, 1, 1, "i0"]
+              - ["direct"]
+        - signature: ["indirect", "direct"]
+          opcode:
+              - [1, 0, 1, 0, 0, 1, 1, "i0"]
+              - ["direct"]
+        - signature: ["register", "immediate"]
+          opcode:
+              - [0, 1, 1, 1, 1, "r2", "r1", "r0"]
+              - ["immediate"]
+        - signature: ["direct", "immediate"]
+          opcode:
+              - [0b0111_0101]
+              - ["direct"]
+              - ["immediate"]
+        - signature: ["indirect", "immediate"]
+          opcode:
+              - [0, 1, 1, 1, 0, 1, 1, "i0"]
+              - ["immediate"]
+        - signature: ["dptr", "immediate16"]
+          opcode:
+              - [0b1001_0000]
+              - ["s15", "s14", "s13", "s12", "s11", "s10", "s9", "s8"]
+              - ["s7", "s6", "s5", "s4", "s3", "s2", "s1", "s0"]
+    STD:
+        - signature: ["direct"]
+          opcode:
+              - [0b1111_0101]
+              - ["direct"]
+    LDB:
+        - signature: ["bit"]
+          opcode:
+              - [0b1010_0010]
+              - ["bit"]
+    STB:
+        - signature: ["bit"]
+          opcode:
+              - [0b1001_0010]
+              - ["bit"]
+    LPM:
+        - signature: ["dptr_offset"]
+          opcode:
+              - [0b1001_0011]
+        - signature: ["pc_offset"]
+          opcode:
+              - [0b1000_0011]
+    LDX:
+        - signature: ["indirect"]
+          opcode:
+              - [1, 1, 1, 0, 0, 0, 1, "i0"]
+        - signature: ["indirect_dptr"]
+          opcode:
+              - [0b1110_0000]
+    STX:
+        - signature: ["indirect"]
+          opcode:
+              - [1, 1, 1, 1, 0, 0, 1, "i0"]
+        - signature: ["indirect_dptr"]
+          opcode:
+              - [0b1111_0000]
+    MUL:
+        - signature: []
+          opcode:
+              - [0b1010_0100]
+    NOP:
+        - signature: []
+          opcode:
+              - [0b0000_0000]
+    OR:
+        - signature: ["register"]
+          opcode:
+              - [0, 1, 0, 0, 1, "r2", "r1", "r0"]
+        - signature: ["direct"]
+          opcode:
+              - [0b_0100_0101]
+              - ["direct"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 1, 0, 0, 0, 1, 1, "i0"]
+        - signature: ["direct", "accu"]
+          opcode:
+              - [0b0100_0010]
+              - ["direct"]
+        - signature: ["direct", "immediate"]
+          opcode:
+              - [0b0100_0011]
+              - ["direct"]
+              - ["immediate"]
+        - signature: ["bit"]
+          opcode:
+              - [0b0111_0010]
+              - ["bit"]
+        - signature: ["not_bit"]
+          opcode:
+              - [0b1010_0000]
+              - ["not_bit"]
+        - signature: ["immediate"]
+          opcode:
+              - [0b_0100_0100]
+              - ["immediate"]
+    POP:
+        - signature: ["direct"]
+          opcode:
+              - [0b1101_0000]
+              - ["direct"]
+    PUSH:
+        - signature: ["direct"]
+          opcode:
+              - [0b1100_0000]
+              - ["direct"]
+    RET:
+        - signature: []
+          opcode:
+              - [0b0010_0010]
+    RETI:
+        - signature: []
+          opcode:
+              - [0b0011_0010]
+    RL:
+        - signature: []
+          opcode:
+              - [0b0010_0011]
+    RLC:
+        - signature: []
+          opcode:
+              - [0b0011_0011]
+    RR:
+        - signature: []
+          opcode:
+              - [0b0000_0011]
+    RRC:
+        - signature: []
+          opcode:
+              - [0b0001_0011]
+    SET:
+        - signature: ["carry"]
+          opcode:
+              - [0b1101_0011]
+        - signature: ["bit"]
+          opcode:
+              - [0b1101_0010]
+              - ["bit"]
+    SJMP:
+        - signature: ["relative"]
+          opcode:
+              - [0b1000_0000]
+              - ["relative"]
+    SUBB:
+        - signature: ["register"]
+          opcode:
+              - [1, 0, 0, 1, 1, "r2", "r1", "r0"]
+        - signature: ["direct"]
+          opcode:
+              - [0b1001_0101]
+              - ["direct"]
+        - signature: ["indirect"]
+          opcode:
+              - [1, 0, 0, 1, 0, 1, 1, "i0"]
+        - signature: ["immediate"]
+          opcode:
+              - [0b1001_0100]
+              - ["immediate"]
+    SWAP:
+        - signature: []
+          opcode:
+              - [0b1100_0100]
+    XCH:
+        - signature: ["accu", "register"]
+          opcode:
+              - [1, 1, 0, 0, 1, "r2", "r1", "r0"]
+        - signature: ["accu", "direct"]
+          opcode:
+              - [0b1100_0101]
+              - ["direct"]
+        - signature: ["accu", "indirect"]
+          opcode:
+              - [1, 1, 0, 0, 0, 1, 1, "i0"]
+    XCHD:
+        - signature: ["accu", "indirect"]
+          opcode:
+              - [1, 1, 0, 1, 0, 1, 1, "i0"]
+    XOR:
+        - signature: ["register"]
+          opcode:
+              - [0, 1, 1, 0, 1, "r2", "r1", "r0"]
+        - signature: ["direct"]
+          opcode:
+              - [0b0110_0101]
+              - ["direct"]
+        - signature: ["indirect"]
+          opcode:
+              - [0, 1, 1, 0, 0, 1, 1, "i0"]
+        - signature: ["direct", "accu"]
+          opcode:
+              - [0b0110_0010]
+              - ["direct"]
+        - signature: ["direct", "immediate"]
+          opcode:
+              - [0b0110_0011]
+              - ["direct"]
+              - ["immediate"]
+        - signature: ["immediate"]
+          opcode:
+              - [0b0110_0100]
+              - ["immediate"]
 
 registers:
     P0:

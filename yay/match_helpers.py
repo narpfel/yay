@@ -14,6 +14,9 @@ def is_direct(candidate):
     return hasattr(candidate, "byte_addr") and candidate.byte_addr in range(256)
 
 
+is_direct_dest = is_direct
+
+
 def is_register(candidate):
     return hasattr(candidate, "number")
 
@@ -26,10 +29,21 @@ def is_immediate(candidate):
     return candidate in range(-128, 256)
 
 
+def is_immediate16(candidate):
+    return candidate in range(2 ** 16)
+
+
+# TODO: support labels
+def is_relative(candidate):
+    return candidate in range(2 ** 8)
 
 
 def is_addr11(candidate):
     return candidate in range(2 ** 11)
+
+
+def is_addr16(candidate):
+    return candidate in range(2 ** 16)
 
 
 def is_accu(candidate):
