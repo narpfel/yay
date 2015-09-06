@@ -40,12 +40,24 @@ class IndirectRegister:
         return "IR{}()".format(self.indirect_number)
 
 
-class immediate:
-    def __init__(self, immediate):
-        self.immediate = immediate
+class Byte:
+    def __init__(self, byte_addr):
+        self.byte_addr = byte_addr
 
     def __int__(self):
-        return self.immediate
+        return self.byte_addr
+
+    def __str__(self):
+        return "Byte({})".format(self.byte_addr)
+
+
+class SFR(Byte):
+    def __init__(self, name, byte_addr):
+        super().__init__(byte_addr)
+        self.name = name
+
+    def __str__(self):
+        return self.name
 
 
 def at(register):

@@ -27,55 +27,6 @@ be made clear that in situations when the argument type is known at write
 time, for clarity reasons the specialized `LDA`, `LDD` and `LDI` are preferred.
 
 
-`immediate` function
---------------------
-
-For macros, it could sometimes be wanted to pass an immediate where
-a direct, register or indirect was expected. Therefore it should be possible
-to override mnemonic signature selection with the `immediate`-Function.
-To implement this, YAML references could be used. On the other hand, it may be
-possible to implement an own reference mechanism, but this seems like
-reinventing the wheel. Alternatively, mnemonics that have both a form *with*
-and *without* a trailing `I` could be automagically converted to support
-`immediate`. Disadvantage: More implicit and may not be always wanted.
-Furthermore, for this to work the mnemonic creation process would have to
-know the names and signatures of *all* mnemonics.
-
-> Explicit is better than implicit.
-
-The problem with references is that directs and immediates are (by design) not
-distinguishable from each other (as they are `int`s), so a mnemonic cannot have
-both an `immediate` and a `direct` as its argument. This is solved by
-adding a `forced: true` key to the signature dict. This will force the
-opcode selection mechanism to use the `is_forced_immediate` matcher instead
-of the `is_immediate` matcher.
-
-Example implementation:
-
-```yaml
-mnemonics:
-    ADDI:
-        - &ADDI
-          signature: ["immediate"]
-          opcode:
-              - [0b0010_0100]
-              - ["immediate"]
-    ADD:
-        - signature: ["direct"]
-          opcode:
-              - [0b0010_0101]
-              - ["direct"]
-        - signature: ["register"]
-          opcode:
-              - [0, 0, 1, 0, 1, "r2", "r1", "r0"]
-        - signature: ["indirect"]
-          opcode:
-              - [0, 0, 1, 0, 0, 1, 1, "i0"]
-        - <<: *ADDI
-          forced: true
-```
-
-
 Config file inheritance
 -----------------------
 

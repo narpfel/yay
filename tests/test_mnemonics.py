@@ -23,18 +23,6 @@ def test_insert_in_opcodes():
     assert binary == b"".join([add.opcode, and_.opcode])
 
 
-def test_immediate():
-    class Test(Program):
-        def main(self):
-            ADD(immediate(250))
-
-    class Expected(Program):
-        def main(self):
-            ADDI(250)
-
-    assert Test().to_binary() == Expected().to_binary()
-
-
 def test_ACALL():
     class Test(Program):
         def main(self):
@@ -46,7 +34,7 @@ def test_ADD():
     class Test(Program):
         def main(self):
             ADD(R3)
-            ADD(42)
+            ADD(Byte(42))
     assert Test().to_binary() == bytes([0b00101011, 0b00100101, 42])
 
 
@@ -94,39 +82,27 @@ def test_ADD_at():
         Test().to_binary()
 
 
-def test_ADDI():
+def test_ADD_immediate():
     class Test(Program):
         def main(self):
-            ADDI(42)
+            ADD(42)
     assert Test().to_binary() == bytes([0b00100100, 42])
 
     class Test(Program):
         def main(self):
-            ADDI(420)
+            ADD(420)
     with raises(WrongSignatureException):
         Test().to_binary()
 
     class Test(Program):
         def main(self):
-            ADDI(42, A)
+            ADD(42, A)
     with raises(TypeError):
         Test().to_binary()
 
     class Test(Program):
         def main(self):
-            ADDI(R1, A)
-    with raises(TypeError):
-        Test().to_binary()
-
-    class Test(Program):
-        def main(self):
-            ADDI(R1)
-    with raises(TypeError):
-        Test().to_binary()
-
-    class Test(Program):
-        def main(self):
-            ADDI(at(R0))
+            ADD(R1, A)
     with raises(TypeError):
         Test().to_binary()
 
@@ -135,7 +111,7 @@ def test_ADDC():
     class Test(Program):
         def main(self):
             ADDC(R7)
-            ADDC(127)
+            ADDC(Byte(127))
 
     assert Test().to_binary() == bytes(
         [0b00111111, 0b00110101, 127]
@@ -144,8 +120,8 @@ def test_ADDC():
     class Test(Program):
         def main(self):
             ADDC(-127)
-    with raises(WrongSignatureException):
-        Test().to_binary()
+            ADDC(250)
+    assert Test().to_binary() == bytes([0b00110100, 129, 0b00110100, 250])
 
 
 def test_ADDC_at():
@@ -153,14 +129,6 @@ def test_ADDC_at():
         def main(self):
             ADDC(at(R0))
     assert Test().to_binary() == bytes([0b00110110])
-
-
-def test_ADDCI():
-    class Test(Program):
-        def main(self):
-            ADDCI(-127)
-            ADDCI(250)
-    assert Test().to_binary() == bytes([0b00110100, 129, 0b00110100, 250])
 
 
 def test_AJMP():
@@ -194,11 +162,11 @@ def test_AND():
     class Test(Program):
         def main(self):
             AND(R3)
-            AND(111)
+            AND(Byte(111))
             # AND direct, A
-            AND(123, A)
+            AND(Byte(123), A)
             # AND direct, immediate
-            AND(100, -42)
+            AND(Byte(100), -42)
     assert Test().to_binary() == bytes([
         0b01011011,
         0b01010101, 111,

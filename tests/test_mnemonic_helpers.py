@@ -3,7 +3,7 @@ from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
 from yay.cpu import make_cpu
-from yay.cpus.MCS_51 import IndirectRegister, at, immediate
+from yay.cpus.MCS_51 import IndirectRegister, Byte, at
 from yay.helpers import InvalidRegisterError
 
 
@@ -18,13 +18,13 @@ globals().update(make_cpu("AT89S8253")["registers"])
 def test_matches_args():
     tests = [
         [[R0], ["register"], True],
-        [[R0, 42], ["register"], False],
-        [[R0, 42], ["register", "direct"], True],
+        [[R0, Byte(42)], ["register"], False],
+        [[R0, Byte(42)], ["register", "direct"], True],
         [[R0], ["register", "direct"], False],
         [[-42], ["immediate"], True],
         [[-130], ["immediate"], False],
         [[250], ["immediate"], True],
-        [[-5], ["direct"], False],
+        [[Byte(-5)], ["direct"], False],
         [[256], ["immediate"], False],
         [[at(R0)], ["indirect"], True],
         [[at(R1)], ["indirect"], True],
@@ -37,16 +37,16 @@ def test_matches_args():
         assert bool(matches_args(args, argument_format, False)) is expected
 
 
+def test_int_not_matches_direct():
+    assert not matches_args([42], ["direct"], False)
+
+
 def test_at():
     assert at(R0).indirect_number == 0
     assert at(at(R0)) is at(R0)
 
     with raises(InvalidRegisterError):
         at(R2)
-
-
-def test_immediate():
-    assert immediate(250).immediate == 250
 
 
 @pytest.mark.xfail(reason="Not implemented yet.")
@@ -57,10 +57,10 @@ def test_at_DPTR():
 def test_matches_kwargs():
     tests = [
         [{"register": R0}, ["register"], True],
-        [{"direct": 13, "register": R5}, ["register", "direct"], True],
+        [{"direct": Byte(13), "register": R5}, ["register", "direct"], True],
         [{"indirect": at(R1), "immediate": -14}, ["indirect", "immediate"], True],
         [{"register": R3}, ["immediate"], False],
-        [{"direct": -42}, ["direct"], False],
+        [{"direct": Byte(-42)}, ["direct"], False],
         [{"immediate": 512}, ["immediate"], False],
     ]
 

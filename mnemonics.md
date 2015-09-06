@@ -29,10 +29,16 @@ Notable changes to stock 8051 assembler
   * `LPM` accesses the program memory.
 
   Hence, all `LD*`, `ST*` and `LPM` mnemonics take one argument (the
-  accumulator) is implicit, whereas `MOV*` operations have *two* operands.
+  accumulator is implicit), whereas `MOV*` operations have *two* operands.
 
   **TODO:** Decide whether to use the Intel-like form `MOV(destination, source)`
   or the AT&T-like form `MOV(source, destination)`.
+* Direct addresses are created using the `Byte` class. Hence, `42` translates
+  to `Byte(42)`. That makes it possible to create immediates without any sigil:
+  `#42` → `42`. Indirect addresses are provided by the `at` function: `@R0` →
+  `at(R0)`.
+* Similarly, bit addresses are created using `Bit`. E. g. `OR(~Bit(42))` is
+  equivalent to `ORL C, /42`.
 
 
 ### List of `MOV` family mnemonics
@@ -112,127 +118,127 @@ Complete list of 8051 mnemonics
 -------------------------------
 
 
-| Mnemonic (with operands)     | `yay` equivalent         | `yay` alternative (under consideration)       | Note |
-|:-----------------------------|:-------------------------|:----------------------------------------------|:-----|
-| **Arithmetic operations**    |                          |                                               |      |
-| ``ADD A, {dir}``             | `ADD(dir)`               |                                               |      |
-| ``ADD A, @Ri``               | `ADDA(Ri)`               |                                               |      |
-| ``ADD A, Rn``                | `ADD(Rn)`                |                                               |      |
-| ``ADD A, #{imm}``            | `ADDI(imm)`              |                                               |      |
-| ``ADDC A, {dir}``            | `ADDC(dir)`              |                                               |      |
-| ``ADDC A, @Ri``              | `ADDCA(Ri)`              |                                               |      |
-| ``ADDC A, Rn``               | `ADDC(Rn)`               |                                               |      |
-| ``ADDC A, #{imm}``           | `ADDCI(imm)`             |                                               |      |
-| ``SUBB A, {dir}``            | `SUBB(dir)`              |                                               |      |
-| ``SUBB A, @Ri``              | `SUBBA(Ri)`              |                                               |      |
-| ``SUBB A, Rn``               | `SUBB(Rn)`               |                                               |      |
-| ``SUBB A, #{imm}``           | `SUBBI(imm)`             |                                               |      |
-| `INC A`                      | `INC(A)`                 | `INC()`                                       |      |
-| `INC {dir}`                  | `INC(dir)`               |                                               |      |
-| `INC @Ri`                    | `INCA(Ri)`               |                                               |      |
-| `INC Rn`                     | `INC(Rn)`                |                                               |      |
-| `INC DPTR`                   | `INC(DPTR)`              |                                               |      |
-| `DEC A`                      | `DEC(A)`                 | `DEC()`                                       |      |
-| `DEC {dir}`                  | `DEC(dir)`               |                                               |      |
-| `DEC @Ri`                    | `DECA(Ri)`               |                                               |      |
-| `DEC Rn`                     | `DEC(Rn)`                |                                               |      |
-| `MUL AB`                     | `MUL(A, B)`              | `MUL()`                                       |      |
-| `DIV AB`                     | `DIV(A, B)`              | `DIV()`                                       |      |
-| `DA A`                       | `DA(A)`                  | `DA()`                                        |      |
-| **Logical operations**       |                          |                                               |      |
-| `ANL A, {dir}`               | `AND(A, dir)`            | `AND(dir)`                                    | 5    |
-| `ANL A, @Ri`                 | `ANDA(A, Ri)`            | `ANDA(Ri)`                                    | 5    |
-| `ANL A, Rn`                  | `AND(A, Rn)`             | `AND(Rn)`                                     | 5    |
-| `ANL A, #{imm}`              | `ANDI(A, imm)`           | `ANDI(imm)`                                   | 5    |
-| `ANL {dir}, A`               | `AND(dir, A)`            |                                               |      |
-| `ANL {dir}, #{imm}`          | `ANDI(dir, imm)`         | `AND(dir, imm)`                               |      |
-| `ORL A, {dir}`               | `OR(A, dir)`             | `OR(dir)`                                     | 5    |
-| `ORL A, @Ri`                 | `ORA(A, Ri)`             | `ORA(Ri)`                                     | 5    |
-| `ORL A, Rn`                  | `OR(A, Rn)`              | `OR(Rn)`                                      | 5    |
-| `ORL A, #{imm}`              | `ORI(A, imm)`            | `ORI(imm)`                                    | 5    |
-| `ORL {dir}, A`               | `OR(dir, A)`             |                                               |      |
-| `ORL {dir}, #{imm}`          | `ORI(dir, imm)`          | `OR(dir, imm)`                                |      |
-| `XRL A, {dir}`               | `XOR(A, dir)`            |                                               |      |
-| `XRL A, @Ri`                 | `XORA(A, Ri)`            |                                               |      |
-| `XRL A, Rn`                  | `XOR(A, Rn)`             |                                               |      |
-| `XRL A, #{imm}`              | `XORI(A, imm)`           |                                               |      |
-| `XRL {dir}, A`               | `XOR(dir, A)`            |                                               |      |
-| `XRL {dir}, #{imm}`          | `XORI(dir, imm)`         | `XOR(dir, imm)`                               |      |
-| `CLR A`                      | `CLR(A)`                 | `CLR()`                                       |      |
-| `CPL A`                      | `CPL(A)`                 | `CPL()`                                       |      |
-| `RL A`                       | `RL(A)`                  | `RL()`                                        |      |
-| `RLC A`                      | `RLC(A)`                 | `RLC()`                                       |      |
-| `RR A`                       | `RR(A)`                  | `RR()`                                        |      |
-| `RRC A`                      | `RRC(A)`                 | `RRC()`                                       |      |
-| `SWAP A`                     | `SWAP(A)`                | `SWAP()`                                      |      |
-| **Data transfer operations** |                          |                                               |      |
-| `MOV A, Rn`                  | `LDR(Rn)`                |                                               |      |
-| `MOV A, {dir}`               | `LDD(dir)`               |                                               |      |
-| `MOV A, @Ri`                 | `LDA(Ri)`                |                                               |      |
-| `MOV A, #{imm}`              | `LDI(imm)`               |                                               |      |
-| `MOV Rn, A`                  | `STR(Rn)`                |                                               |      |
-| `MOV Rn, {dir}`              | `MOV(Rn, dir)`           |                                               |      |
-| `MOV Rn, #{imm}`             | `MOVI(Rn, imm)`          |                                               |      |
-| `MOV {dir}, A`               | `STD(dir)`               |                                               |      |
-| `MOV {dir}, Rn`              | `MOV(dir, Rn)`           |                                               |      |
-| `MOV {dir}, {dir}`           | `MOV(dir, dir)`          |                                               |      |
-| `MOV {dir}, @Ri`             | `MOVA(dir, Ri)`          |                                               |      |
-| `MOV {dir}, #{imm}`          | `MOVI(dir, imm)`         |                                               |      |
-| `MOV @Ri, A`                 | `STA(Ri)`                |                                               |      |
-| `MOV @Ri, {dir}`             | `MOVA(Ri, dir)`          |                                               |      |
-| `MOV @Ri, #{imm}`            | `MOVAI(Ri, imm)`         |                                               |      |
-| `MOV DPTR, {addr16}`         | `MOVI(DPTR, addr16)`     |                                               |      |
-| `MOVC A, @A+DPTR`            | `LPM(A + DPTR)`          |                                               |      |
-| `MOVC A, @A+PC`              | `LPM(A + PC)`            |                                               |      |
-| `MOVX A, @Ri`                | `LDX(Ri)`                | `LDXA(Ri)`                                    | 4    |
-| `MOVX A, @DPTR`              | `LDX(DPTR)`              | `LDXA(DPTR)`                                  | 4    |
-| `MOVX @Ri, A`                | `STX(Ri)`                | `STXA(Ri)`                                    | 4    |
-| `MOVX @DPTR, A`              | `STX(DPTR)`              | `STXA(DPTR)`                                  | 4    |
-| `PUSH {dir}`                 | `PUSH(dir)`              |                                               |      |
-| `POP {dir}`                  | `POP(dir)`               |                                               |      |
-| `XCH A, {dir}`               | `XCH(A, dir)`            |                                               |      |
-| `XCH A, @Ri`                 | `XCHA(A, Ri)`            |                                               |      |
-| `XCH A, Rn`                  | `XCH(A, Rn)`             |                                               |      |
-| `XCHD A, @Ri`                | `XCHDA(A, Ri)`           | `XCHD(A, Ri)`                                 | 4    |
-| **Boolean operations**       |                          |                                               |      |
-| `CLR C`                      | `CLR(C)`                 |                                               |      |
-| `CLR {bit}`                  | `CLR(bit)`               |                                               |      |
-| `SETB C`                     | `SETB(C)`                | `SETC()`                                      |      |
-| `SETB {bit}`                 | `SETB(bit)`              |                                               |      |
-| `CPL C`                      | `CPL(C)`                 | `CPLC()`                                      |      |
-| `CPL {bit}`                  | `CPL(bit)`               |                                               |      |
-| `ANL C, {bit}`               | `ANDB(bit)`              | `AND(C, bit)` or `AND(bit)`                   | 5, 6 |
-| `ANL C, /{bit}`              | `ANDNB(bit)`             | `ANDB(~bit)` or `AND(C, ~bit)` or `AND(~bit)` | 5, 6 |
-| `ORL C, {bit}`               | `ORB(bit)`               | `OR(C, bit)` or `OR(bit)`                     | 5, 6 |
-| `ORL C, /{bit}`              | `ORNB(bit)`              | `ORB(~bit)` or `OR(C, bit)` or `OR(~bit)`     | 5, 6 |
-| `MOV C, {bit}`               | `LDB(bit)`               |                                               |      |
-| `MOV {bit}, C`               | `STB(bit)`               |                                               |      |
-| `JC {rel}`                   | `JC(label)`              | `JB(C, label)`                                | 1    |
-| `JNC {rel}`                  | `JNC(label)`             | `JNB(C, label)`                               | 1    |
-| `JB {bit}, {rel}`            | `JB(bit, label)`         |                                               |      |
-| `JNB {bit}, {rel}`           | `JNB(bit, label)`        |                                               |      |
-| `JBC {bit}, {rel}`           | `JBC(bit, label)`        |                                               |      |
-| **Control flow operations**  |                          |                                               |      |
-| `CALL {addr}`                | `CALL(label)`            |                                               | 1, 2 |
-| `ACALL {addr11}`             | `ACALL(label)`           |                                               | 1, 3 |
-| `LCALL {addr16}`             | `LCALL(label)`           |                                               | 1    |
-| `RET`                        | `RET()`                  |                                               |      |
-| `RETI`                       | `RETI()`                 |                                               |      |
-| `JMP {addr}`                 | `JMP(label)`             |                                               | 1, 2 |
-| `AJMP {addr11}`              | `AJMP(label)`            |                                               | 1, 3 |
-| `LJMP {addr16}`              | `LJMP(label)`            |                                               | 1    |
-| `SJMP {rel}`                 | `SJMP(label)`            |                                               | 1    |
-| `JMP @A + DPTR`              | `JMPA(A + DPTR)`         |                                               |      |
-| `JZ {rel}`                   | `JZ(label)`              |                                               | 1    |
-| `JNZ {rel}`                  | `JNZ(label)`             |                                               | 1    |
-| `CJNE A, {dir}, {rel}`       | `CJNE(A, dir, label)`    |                                               | 1    |
-| `CJNE A, #{imm}, {rel}`      | `CJNEI(A, imm, label)`   |                                               | 1    |
-| `CJNE Rn, #{imm}, {rel}`     | `CJNEI(Rn, imm, label)`  | `CJNE(Rn, imm, label)`                        | 1    |
-| `CJNE @Ri, #{imm}, {rel}`    | `CJNEAI(Ri, imm, label)` | `CJNEA(Ri, imm, label)`                       | 1    |
-| `DJNZ Rn, {rel}`             | `DJNZ(Rn, label)`        |                                               | 1    |
-| `DJNZ {dir}, {rel}`          | `DJNZ(dir, label)`       |                                               | 1    |
-| **Not an operation**         |                          |                                               |      |
-| `NOP`                        | `NOP()`                  |                                               |      |
+| Mnemonic (with operands)     | `yay` equivalent           | `yay` alternative (under consideration) | Note |
+|:-----------------------------|:---------------------------|:----------------------------------------|:-----|
+| **Arithmetic operations**    |                            |                                         |      |
+| ``ADD A, {dir}``             | `ADD(dir)`                 |                                         |      |
+| ``ADD A, @Ri``               | `ADD(at(Ri))`              |                                         |      |
+| ``ADD A, Rn``                | `ADD(Rn)`                  |                                         |      |
+| ``ADD A, #{imm}``            | `ADD(imm)`                 |                                         |      |
+| ``ADDC A, {dir}``            | `ADDC(dir)`                |                                         |      |
+| ``ADDC A, @Ri``              | `ADDC(at(Ri))`             |                                         |      |
+| ``ADDC A, Rn``               | `ADDC(Rn)`                 |                                         |      |
+| ``ADDC A, #{imm}``           | `ADDC(imm)`                |                                         |      |
+| ``SUBB A, {dir}``            | `SUBB(dir)`                |                                         |      |
+| ``SUBB A, @Ri``              | `SUBB(at(Ri))`             |                                         |      |
+| ``SUBB A, Rn``               | `SUBB(Rn)`                 |                                         |      |
+| ``SUBB A, #{imm}``           | `SUBB(imm)`                |                                         |      |
+| `INC A`                      | `INC()`                    |                                         |      |
+| `INC {dir}`                  | `INC(dir)`                 |                                         |      |
+| `INC @Ri`                    | `INC(at(Ri))`              |                                         |      |
+| `INC Rn`                     | `INC(Rn)`                  |                                         |      |
+| `INC DPTR`                   | `INC(DPTR)`                |                                         |      |
+| `DEC A`                      | `DEC()`                    |                                         |      |
+| `DEC {dir}`                  | `DEC(dir)`                 |                                         |      |
+| `DEC @Ri`                    | `DEC(at(Ri))`              |                                         |      |
+| `DEC Rn`                     | `DEC(Rn)`                  |                                         |      |
+| `MUL AB`                     | `MUL()`                    |                                         |      |
+| `DIV AB`                     | `DIV()`                    |                                         |      |
+| `DA A`                       | `DA()`                     |                                         |      |
+| **Logical operations**       |                            |                                         |      |
+| `ANL A, {dir}`               | `AND(dir)`                 |                                         |      |
+| `ANL A, @Ri`                 | `AND(at(Ri))`              |                                         |      |
+| `ANL A, Rn`                  | `AND(Rn)`                  |                                         |      |
+| `ANL A, #{imm}`              | `AND(imm)`                 |                                         |      |
+| `ANL {dir}, A`               | `AND(dir, A)`              |                                         |      |
+| `ANL {dir}, #{imm}`          | `AND(dir, imm)`            |                                         |      |
+| `ORL A, {dir}`               | `OR(dir)`                  |                                         |      |
+| `ORL A, @Ri`                 | `OR(at(Ri))`               |                                         |      |
+| `ORL A, Rn`                  | `OR(Rn)`                   |                                         |      |
+| `ORL A, #{imm}`              | `OR(imm)`                  |                                         |      |
+| `ORL {dir}, A`               | `OR(dir, A)`               |                                         |      |
+| `ORL {dir}, #{imm}`          | `OR(dir, imm)`             |                                         |      |
+| `XRL A, {dir}`               | `XOR(dir)`                 |                                         |      |
+| `XRL A, @Ri`                 | `XOR(at(Ri))`              |                                         |      |
+| `XRL A, Rn`                  | `XOR(Rn)`                  |                                         |      |
+| `XRL A, #{imm}`              | `XOR(imm)`                 |                                         |      |
+| `XRL {dir}, A`               | `XOR(dir, A)`              |                                         |      |
+| `XRL {dir}, #{imm}`          | `XOR(dir, imm)`            |                                         |      |
+| `CLR A`                      | `CLR()`                    |                                         |      |
+| `CPL A`                      | `CPL()`                    |                                         |      |
+| `RL A`                       | `RL()`                     |                                         |      |
+| `RLC A`                      | `RLC()`                    |                                         |      |
+| `RR A`                       | `RR()`                     |                                         |      |
+| `RRC A`                      | `RRC()`                    |                                         |      |
+| `SWAP A`                     | `SWAP()`                   |                                         |      |
+| **Data transfer operations** |                            |                                         |      |
+| `MOV A, Rn`                  | `LDR(Rn)`                  |                                         |      |
+| `MOV A, {dir}`               | `LDD(dir)`                 |                                         |      |
+| `MOV A, @Ri`                 | `LDR(at(Ri))`              |                                         |      |
+| `MOV A, #{imm}`              | `LDI(imm)`                 |                                         |      |
+| `MOV Rn, A`                  | `STR(Rn)`                  |                                         |      |
+| `MOV Rn, {dir}`              | `MOV(Rn, dir)`             |                                         |      |
+| `MOV Rn, #{imm}`             | `MOV(Rn, imm)`             |                                         |      |
+| `MOV {dir}, A`               | `STD(dir)`                 |                                         |      |
+| `MOV {dir}, Rn`              | `MOV(dir, Rn)`             |                                         |      |
+| `MOV {dir}, {dir}`           | `MOV(dir, dir)`            |                                         |      |
+| `MOV {dir}, @Ri`             | `MOV(dir, at(Ri))`         |                                         |      |
+| `MOV {dir}, #{imm}`          | `MOV(dir, imm)`            |                                         |      |
+| `MOV @Ri, A`                 | `STR(at(Ri))`              |                                         |      |
+| `MOV @Ri, {dir}`             | `MOV(at(Ri), dir)`         |                                         |      |
+| `MOV @Ri, #{imm}`            | `MOV(at(Ri), imm)`         |                                         |      |
+| `MOV DPTR, {addr16}`         | `MOV(DPTR, addr16)`        |                                         |      |
+| `MOVC A, @A+DPTR`            | `LPM(at(A + DPTR))`        |                                         |      |
+| `MOVC A, @A+PC`              | `LPM(at(A + PC))`          |                                         |      |
+| `MOVX A, @Ri`                | `LDX(at(Ri))`              |                                         |      |
+| `MOVX A, @DPTR`              | `LDX(at(DPTR))`            |                                         |      |
+| `MOVX @Ri, A`                | `STX(at(Ri))`              |                                         |      |
+| `MOVX @DPTR, A`              | `STX(at(DPTR))`            |                                         |      |
+| `PUSH {dir}`                 | `PUSH(dir)`                |                                         |      |
+| `POP {dir}`                  | `POP(dir)`                 |                                         |      |
+| `XCH A, {dir}`               | `XCH(A, dir)`              |                                         |      |
+| `XCH A, @Ri`                 | `XCH(A, at(Ri))`           |                                         |      |
+| `XCH A, Rn`                  | `XCH(A, Rn)`               |                                         |      |
+| `XCHD A, @Ri`                | `XCHD(A, at(Ri))`          |                                         |      |
+| **Boolean operations**       |                            |                                         |      |
+| `CLR C`                      | `CLR(C)`                   |                                         |      |
+| `CLR {bit}`                  | `CLR(bit)`                 |                                         |      |
+| `SETB C`                     | `SET(C)`                   |                                         |      |
+| `SETB {bit}`                 | `SET(bit)`                 |                                         |      |
+| `CPL C`                      | `CPL(C)`                   |                                         |      |
+| `CPL {bit}`                  | `CPL(bit)`                 |                                         |      |
+| `ANL C, {bit}`               | `AND(bit)`                 |                                         |      |
+| `ANL C, /{bit}`              | `AND(~bit)`                |                                         |      |
+| `ORL C, {bit}`               | `OR(bit)`                  |                                         |      |
+| `ORL C, /{bit}`              | `OR(~bit)`                 |                                         |      |
+| `MOV C, {bit}`               | `LDB(bit)`                 |                                         |      |
+| `MOV {bit}, C`               | `STB(bit)`                 |                                         |      |
+| `JC {rel}`                   | `JC(label)`                | `JB(C, label)`                          | 1    |
+| `JNC {rel}`                  | `JNC(label)`               | `JNB(C, label)`                         | 1    |
+| `JB {bit}, {rel}`            | `JB(bit, label)`           |                                         |      |
+| `JNB {bit}, {rel}`           | `JNB(bit, label)`          |                                         |      |
+| `JBC {bit}, {rel}`           | `JBC(bit, label)`          |                                         |      |
+| **Control flow operations**  |                            |                                         |      |
+| `CALL {addr}`                | `CALL(label)`              |                                         | 1, 2 |
+| `ACALL {addr11}`             | `ACALL(label)`             |                                         | 1, 3 |
+| `LCALL {addr16}`             | `LCALL(label)`             |                                         | 1    |
+| `RET`                        | `RET()`                    |                                         |      |
+| `RETI`                       | `RETI()`                   |                                         |      |
+| `JMP {addr}`                 | `JMP(label)`               |                                         | 1, 2 |
+| `AJMP {addr11}`              | `AJMP(label)`              |                                         | 1, 3 |
+| `LJMP {addr16}`              | `LJMP(label)`              |                                         | 1    |
+| `SJMP {rel}`                 | `SJMP(label)`              |                                         | 1    |
+| `JMP @A + DPTR`              | `JMP(at(A + DPTR))`        |                                         |      |
+| `JZ {rel}`                   | `JZ(label)`                |                                         | 1    |
+| `JNZ {rel}`                  | `JNZ(label)`               |                                         | 1    |
+| `CJNE A, {dir}, {rel}`       | `CJNE(A, dir, label)`      |                                         | 1    |
+| `CJNE A, #{imm}, {rel}`      | `CJNE(A, imm, label)`      |                                         | 1    |
+| `CJNE Rn, #{imm}, {rel}`     | `CJNE(Rn, imm, label)`     |                                         | 1    |
+| `CJNE @Ri, #{imm}, {rel}`    | `CJNE(at(Ri), imm, label)` |                                         | 1    |
+| `DJNZ Rn, {rel}`             | `DJNZ(Rn, label)`          |                                         | 1    |
+| `DJNZ {dir}, {rel}`          | `DJNZ(dir, label)`         |                                         | 1    |
+| **Not an operation**         |                            |                                         |      |
+| `NOP`                        | `NOP()`                    |                                         |      |
 
 
 
@@ -243,14 +249,9 @@ Notes
    and because `yay` does not specify in which order different blocks will be
    ordered.
 2. These are pseudo instructions that are assembled into `S`-, `A`- or `LCALL`s
-   or -`JMP`s.
+   or -`JMP`s. They will likely be be implemented as macros. Furthermore,
+   instruction length will have to be known on first pass (when labels have been
+   implemented) so that correct relative addresses can be computed on the
+   second pass.
 3. `yay` does not guarantee the order of functions in the assembled program,
    hence implementing `ACALL` and `AJMP` correctly could be difficult.
-4. The mnemonics that end in `A` are consistent with the other mnemonics where
-   an `A` suffix denotes indirect access (e. g. `ANDA(A, Ri)` → “AND `A` with
-   data *at* location `Ri`”). The forms without the ending `A` are more concise
-   (there is no `STX` and `LDX` that is *not* indirect, hence the `A` is
-   redundant).
-5. Hmm... **TODO!**
-6. The one-argument form would be distinguished by the type of the argument.
-   Disadvantage: More implicit.

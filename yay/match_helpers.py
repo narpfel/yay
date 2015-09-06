@@ -8,12 +8,12 @@
 from yay.cpus.MCS_51 import Accumulator
 
 
+def is_direct(candidate):
+    return hasattr(candidate, "byte_addr") and candidate.byte_addr in range(256)
+
+
 def is_register(candidate):
     return hasattr(candidate, "number")
-
-
-def is_direct(candidate):
-    return candidate in range(256)
 
 
 def is_indirect(candidate):
@@ -24,8 +24,6 @@ def is_immediate(candidate):
     return candidate in range(-128, 256)
 
 
-def is_forced_immediate(candidate):
-    return hasattr(candidate, "immediate") and is_immediate(candidate.immediate)
 
 
 def is_addr11(candidate):
