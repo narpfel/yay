@@ -90,6 +90,11 @@ class SFR(Byte):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return "SFR(name={self.name!r}, byte_addr={self.byte_addr})".format(
+            self=self
+        )
+
 
 class Bit:
     def __init__(self, bit_addr):
