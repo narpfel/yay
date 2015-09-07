@@ -8,23 +8,20 @@ from yay.helpers import (
 )
 
 
-# TODO: Decide whether `forced` should be optional.
-def matches_args(args, argument_format, forced):
+def matches_args(args, argument_format):
     return len(args) == len(argument_format) and all(
         getattr(
             match_helpers,
-            "is_{}{}".format("forced_" if forced else "", name)
+            "is_{}".format(name)
         )(argument)
         for name, argument in zip(argument_format, args)
     )
 
 
-# TODO: Decide whether `forced` should be optional.
-def matches_kwargs(kwargs, argument_format, forced):
+def matches_kwargs(kwargs, argument_format):
     return set(kwargs) == set(argument_format) and matches_args(
         [kwargs[argname] for argname in argument_format],
-        argument_format,
-        forced
+        argument_format
     )
 
 
@@ -115,14 +112,13 @@ def make_mnemonic(name, signatures, signature_contents):
             self.signature = signature
             opcode_format = signature["opcode"]
             argument_format = signature["signature"]
-            forced = signature.get("forced", False)
 
-            if argument_format and matches_kwargs(kwargs, argument_format, forced):
+            if argument_format and matches_kwargs(kwargs, argument_format):
                 self.opcode = opcode_from_kwargs(
                     opcode_format, kwargs, signature_contents
                 )
                 break
-            elif matches_args(args, argument_format, forced):
+            elif matches_args(args, argument_format):
                 self.opcode = opcode_from_args(
                     opcode_format, argument_format, args, signature_contents
                 )

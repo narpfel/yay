@@ -34,11 +34,11 @@ def test_matches_args():
         [[P1], ["direct"], True],
     ]
     for args, argument_format, expected in tests:
-        assert bool(matches_args(args, argument_format, False)) is expected
+        assert bool(matches_args(args, argument_format)) is expected
 
 
 def test_int_not_matches_direct():
-    assert not matches_args([42], ["direct"], False)
+    assert not matches_args([42], ["direct"])
 
 
 def test_at():
@@ -64,4 +64,4 @@ def test_matches_kwargs():
     ]
 
     for kwargs, argument_format, expected in tests:
-        assert bool(matches_kwargs(kwargs, argument_format, False)) is expected
+        assert bool(matches_kwargs(kwargs, argument_format)) is expected
