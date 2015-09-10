@@ -3,7 +3,7 @@ from pytest import raises
 
 from yay.mnemonics import matches_args, matches_kwargs
 from yay.cpu import make_cpu
-from yay.cpus.MCS_51 import IndirectRegister, Byte, at, DptrOffset
+from yay.cpus.MCS_51 import IndirectRegister, Byte, at, DptrOffset, matchers
 from yay.helpers import InvalidRegisterError
 
 
@@ -34,11 +34,11 @@ def test_matches_args():
         [[P1], ["direct"], True],
     ]
     for args, argument_format, expected in tests:
-        assert bool(matches_args(args, argument_format)) is expected
+        assert bool(matches_args(args, argument_format, matchers)) is expected
 
 
 def test_int_not_matches_direct():
-    assert not matches_args([42], ["direct"])
+    assert not matches_args([42], ["direct"], matchers)
 
 
 def test_at():
@@ -64,4 +64,4 @@ def test_matches_kwargs():
     ]
 
     for kwargs, argument_format, expected in tests:
-        assert bool(matches_kwargs(kwargs, argument_format)) is expected
+        assert bool(matches_kwargs(kwargs, argument_format, matchers)) is expected

@@ -1,10 +1,3 @@
-# TODO: Should this be moved to `yay.cpu.AT89S8253`?
-# If so, mnemonics would have to know where to retrieve their `match_helpers`.
-# This could be done via their config file.
-# If not, *all* `match_helpers` fromm all cpu families would go here and name
-# collisions would be possible.
-# Preference: Yes.
-
 from yay.cpus.MCS_51 import (
     Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset, Carry
 )

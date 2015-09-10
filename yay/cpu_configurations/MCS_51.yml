@@ -690,9 +690,14 @@ additional_names:
     Bit:
         import: "Bit"
 
+matchers:
+    matchers:
+        import: "matchers"
+
 importing:
     additional_names: "yay.cpus.MCS_51"
     registers: "yay.cpus.MCS_51"
+    matchers: "yay.cpus.MCS_51"
 
 all:
     - "mnemonics"

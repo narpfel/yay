@@ -1,26 +1,26 @@
 from functools import partial
 import re
 
-from yay import match_helpers
 from yay.helpers import (
     reverse_dict, InvalidConfigError, WrongSignatureException, twos_complement
 )
 
 
-def matches_args(args, argument_format):
+def matches_args(args, argument_format, matchers):
     return len(args) == len(argument_format) and all(
         getattr(
-            match_helpers,
+            matchers,
             "is_{}".format(name)
         )(argument)
         for name, argument in zip(argument_format, args)
     )
 
 
-def matches_kwargs(kwargs, argument_format):
+def matches_kwargs(kwargs, argument_format, matchers):
     return set(kwargs) == set(argument_format) and matches_args(
         [kwargs[argname] for argname in argument_format],
-        argument_format
+        argument_format,
+        matchers,
     )
 
 
@@ -105,6 +105,7 @@ def make_mnemonic(name, signatures, signature_contents):
                 "Mixing of positional and keyword arguments is not allowed."
             )
 
+        matchers = self.program.cpu["matchers"]["matchers"]
         # TODO: Refactor this `for` loop into a method/function that returns
         # `(init_args, signature, opcode)`.
         for signature in signatures:
@@ -113,12 +114,12 @@ def make_mnemonic(name, signatures, signature_contents):
             opcode_format = signature["opcode"]
             argument_format = signature["signature"]
 
-            if argument_format and matches_kwargs(kwargs, argument_format):
+            if argument_format and matches_kwargs(kwargs, argument_format, matchers):
                 self.opcode = opcode_from_kwargs(
                     opcode_format, kwargs, signature_contents
                 )
                 break
-            elif matches_args(args, argument_format):
+            elif matches_args(args, argument_format, matchers):
                 self.opcode = opcode_from_args(
                     opcode_format, argument_format, args, signature_contents
                 )
