@@ -1,4 +1,3 @@
-from contextlib import suppress
 from functools import partial
 import re
 
@@ -94,9 +93,10 @@ def get_bit(number, bit):
 
 def make_mnemonic(name, signatures, signature_contents):
     def __init__(self, *args, **kwargs):
-        super_args = {"target": kwargs.pop("target")}
-        with suppress(KeyError):
-            super_args["auto"] = kwargs.pop("auto")
+        try:
+            super_args = {"auto": kwargs.pop("auto")}
+        except KeyError:
+            super_args = {}
         Mnemonic.__init__(self, **super_args)
         self._signature_contents = signature_contents
 
@@ -141,13 +141,13 @@ def make_mnemonics(config):
 
 
 class Mnemonic:
-    def __init__(self, target, auto=True):
+    def __init__(self, auto=True):
         if auto:
-            target.append(self)
+            self.program.append(self)
 
     @classmethod
-    def bind_target(cls, target):
-        return partial(cls, target=target)
+    def bind_program(cls, program):
+        return type(cls.__name__, (cls, ), dict(program=program))
 
     @property
     def size(self):
