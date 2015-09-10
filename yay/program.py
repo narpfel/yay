@@ -18,10 +18,10 @@ class ProgramMeta(type):
 class Program(metaclass=ProgramMeta):
     def __init__(self):
         self._opcodes = self._opcode_destination()
-        cpu = make_cpu(self._cpu_spec)
+        self.cpu = make_cpu(self._cpu_spec)
         self._cpu_namespace = {}
-        for section_name in cpu["all"]:
-            for name, item in cpu[section_name].items():
+        for section_name in self.cpu["all"]:
+            for name, item in self.cpu[section_name].items():
                 try:
                     self._cpu_namespace[name] = item.bind_program(self)
                 except AttributeError:
