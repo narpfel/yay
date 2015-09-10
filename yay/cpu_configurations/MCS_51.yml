@@ -689,6 +689,8 @@ additional_names:
         import: "Byte"
     Bit:
         import: "Bit"
+    Label:
+        import: "Label"
 
 matchers:
     matchers:

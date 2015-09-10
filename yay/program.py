@@ -29,8 +29,15 @@ class Program(metaclass=ProgramMeta):
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
 
+        self.labels = {}
+        self.position = 0
+
     def append(self, mnemonic):
         self._opcodes.append(mnemonic)
+        self.position += mnemonic.size
+
+    def add_label(self, label):
+        self.labels[label] = self.position
 
     def to_binary(self):
         self.main()
