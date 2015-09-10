@@ -23,12 +23,14 @@ class Program(metaclass=ProgramMeta):
         for section_name in cpu["all"]:
             for name, item in cpu[section_name].items():
                 try:
-                    self._cpu_namespace[name] = item.bind_target(self._opcodes)
+                    self._cpu_namespace[name] = item.bind_target(self)
                 except AttributeError:
                     self._cpu_namespace[name] = item
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
 
+    def append(self, mnemonic):
+        self._opcodes.append(mnemonic)
 
     def to_binary(self):
         self.main()
