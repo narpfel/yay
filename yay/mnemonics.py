@@ -6,69 +6,6 @@ from yay.helpers import (
 )
 
 
-def matches_args(args, argument_format, matchers):
-    return len(args) == len(argument_format) and all(
-        getattr(
-            matchers,
-            "is_{}".format(name)
-        )(argument)
-        for name, argument in zip(argument_format, args)
-    )
-
-
-def matches_kwargs(kwargs, argument_format, matchers):
-    return set(kwargs) == set(argument_format) and matches_args(
-        [kwargs[argname] for argname in argument_format],
-        argument_format,
-        matchers,
-    )
-
-
-def opcode_from_args(opcode_format, argument_format, args, signature_contents):
-    return opcode_from_kwargs(
-        opcode_format,
-        dict(zip(argument_format, args)),
-        signature_contents
-    )
-
-
-def opcode_from_kwargs(opcode_format, kwargs, signature_contents):
-    return bytes(
-        twos_complement(
-            process_byte(byte_format, kwargs, signature_contents),
-            8
-        )
-        for byte_format in opcode_format
-    )
-
-
-def process_byte(byte_format, kwargs, signature_contents):
-    try:
-        if len(byte_format) == 1:
-            # TODO: Should arguments unconditionally be converted to `int`?
-            # Does this promote subtle bugs in production code?
-            return int(try_match_byte(byte_format[0], kwargs))
-        elif len(byte_format) == 8:
-            short_to_argname = reverse_dict({
-                # TODO: Better name for `value`.
-                argname: value["short"]
-                for argname, value in signature_contents.items()
-                if value["short"] is not None
-            })
-            result = 0
-            for digit, bit_format in enumerate(reversed(byte_format)):
-                result |= try_match_bit(
-                    bit_format, short_to_argname, kwargs
-                ) << digit
-            return result
-        else:
-            raise ValueError("`byte_format` length must be either 1 or 8.")
-    except ValueError as err:
-        raise InvalidConfigError(
-            "Invalid configuration: {!r}".format(byte_format)
-        ) from err
-
-
 def try_match_bit(bit_format, short_to_argname, kwargs):
     try:
         match = re.match(r"(\w)(\d+)", bit_format)
@@ -105,7 +42,6 @@ def make_mnemonic(name, signatures, signature_contents):
                 "Mixing of positional and keyword arguments is not allowed."
             )
 
-        matchers = self.program.cpu["matchers"]["matchers"]
         # TODO: Refactor this `for` loop into a method/function that returns
         # `(init_args, signature, opcode)`.
         for signature in signatures:
@@ -114,14 +50,14 @@ def make_mnemonic(name, signatures, signature_contents):
             opcode_format = signature["opcode"]
             argument_format = signature["signature"]
 
-            if argument_format and matches_kwargs(kwargs, argument_format, matchers):
-                self.opcode = opcode_from_kwargs(
-                    opcode_format, kwargs, signature_contents
+            if argument_format and self.matches_kwargs(kwargs, argument_format):
+                self.opcode = self.opcode_from_kwargs(
+                    opcode_format, kwargs
                 )
                 break
-            elif matches_args(args, argument_format, matchers):
-                self.opcode = opcode_from_args(
-                    opcode_format, argument_format, args, signature_contents
+            elif self.matches_args(args, argument_format):
+                self.opcode = self.opcode_from_args(
+                    opcode_format, argument_format, args
                 )
                 break
         else:
@@ -153,6 +89,66 @@ class Mnemonic:
     @property
     def size(self):
         return len(self.opcode)
+
+    def matches_args(self, args, argument_format):
+        return len(args) == len(argument_format) and all(
+            getattr(
+                self.program.cpu["matchers"]["matchers"],
+                "is_{}".format(name)
+            )(argument)
+            for name, argument in zip(argument_format, args)
+        )
+
+
+    def matches_kwargs(self, kwargs, argument_format):
+        return set(kwargs) == set(argument_format) and self.matches_args(
+            [kwargs[argname] for argname in argument_format],
+            argument_format,
+        )
+
+
+    def opcode_from_args(self, opcode_format, argument_format, args):
+        return self.opcode_from_kwargs(
+            opcode_format,
+            dict(zip(argument_format, args)),
+        )
+
+
+    def opcode_from_kwargs(self, opcode_format, kwargs):
+        return bytes(
+            twos_complement(
+                self.process_byte(byte_format, kwargs),
+                8
+            )
+            for byte_format in opcode_format
+        )
+
+
+    def process_byte(self, byte_format, kwargs):
+        try:
+            if len(byte_format) == 1:
+                # TODO: Should arguments unconditionally be converted to `int`?
+                # Does this promote subtle bugs in production code?
+                return int(try_match_byte(byte_format[0], kwargs))
+            elif len(byte_format) == 8:
+                short_to_argname = reverse_dict({
+                    # TODO: Better name for `value`.
+                    argname: value["short"]
+                    for argname, value in self._signature_contents.items()
+                    if value["short"] is not None
+                })
+                result = 0
+                for digit, bit_format in enumerate(reversed(byte_format)):
+                    result |= try_match_bit(
+                        bit_format, short_to_argname, kwargs
+                    ) << digit
+                return result
+            else:
+                raise ValueError("`byte_format` length must be either 1 or 8.")
+        except ValueError as err:
+            raise InvalidConfigError(
+                "Invalid configuration: {!r}".format(byte_format)
+            ) from err
 
     def __repr__(self):
         return "{name}({args})".format(

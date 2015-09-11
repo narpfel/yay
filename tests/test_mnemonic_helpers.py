@@ -1,7 +1,7 @@
 import pytest
-from pytest import raises
+from pytest import raises, fixture
 
-from yay.mnemonics import matches_args, matches_kwargs
+from yay.mnemonics import Mnemonic
 from yay.cpu import make_cpu
 from yay.cpus.MCS_51 import IndirectRegister, Byte, at, DptrOffset, matchers
 from yay.helpers import InvalidRegisterError
@@ -15,7 +15,17 @@ globals().update(make_cpu("AT89S8253")["registers"])
 # A = AT89S8253.A
 
 
-def test_matches_args():
+@fixture
+def test_mnemonic():
+    mnemonic = Mnemonic(auto=False)
+    class ProgramMock:
+        cpu = {"matchers": {"matchers": matchers}}
+    mnemonic.program = ProgramMock
+    return mnemonic
+
+
+
+def test_matches_args(test_mnemonic):
     tests = [
         [[R0], ["register"], True],
         [[R0, Byte(42)], ["register"], False],
@@ -34,11 +44,11 @@ def test_matches_args():
         [[P1], ["direct"], True],
     ]
     for args, argument_format, expected in tests:
-        assert bool(matches_args(args, argument_format, matchers)) is expected
+        assert bool(test_mnemonic.matches_args(args, argument_format)) is expected
 
 
-def test_int_not_matches_direct():
-    assert not matches_args([42], ["direct"], matchers)
+def test_int_not_matches_direct(test_mnemonic):
+    assert not test_mnemonic.matches_args([42], ["direct"])
 
 
 def test_at():
@@ -53,7 +63,7 @@ def test_at_DPTR():
     assert isinstance(at(A + DPTR), DptrOffset)
 
 
-def test_matches_kwargs():
+def test_matches_kwargs(test_mnemonic):
     tests = [
         [{"register": R0}, ["register"], True],
         [{"direct": Byte(13), "register": R5}, ["register", "direct"], True],
@@ -64,4 +74,4 @@ def test_matches_kwargs():
     ]
 
     for kwargs, argument_format, expected in tests:
-        assert bool(matches_kwargs(kwargs, argument_format, matchers)) is expected
+        assert bool(test_mnemonic.matches_kwargs(kwargs, argument_format)) is expected
