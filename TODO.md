@@ -25,23 +25,3 @@ cannot be used anymore because they encode their argument type in their names.
 Introducing a polymorphic mnmonic `LD` will solve this problem. It should
 be made clear that in situations when the argument type is known at write
 time, for clarity reasons the specialized `LDA`, `LDD` and `LDI` are preferred.
-
-
-Config file inheritance
------------------------
-
-It should be possible to inherit from another config file (e. g. `AT89S8253`
-could inherit from `MC51`) via the `inherit_from` key:
-
-```yaml
-inherit_from: "MC51"
-mnemonics:
-    ...
-```
-
-If the value of `inherit_from` is relative (according to `os.path.isabs`), it is
-taken as a default config file (located at `yay/cpu_configurations`). Otherwise,
-the file at the corresponding absolute path is used as a base YAML file.
-
-Inheritance will be modeled by a simple recursive merge of the two configuration
-dictionaries.
