@@ -37,6 +37,9 @@ def make_mnemonic(name, signatures, signature_contents):
         Mnemonic.__init__(self, **super_args)
         self._signature_contents = signature_contents
 
+        self._init_args = args
+        self._init_kwargs = kwargs
+
         if args and kwargs:
             raise WrongSignatureException(
                 "Mixing of positional and keyword arguments is not allowed."
@@ -45,7 +48,6 @@ def make_mnemonic(name, signatures, signature_contents):
         # TODO: Refactor this `for` loop into a method/function that returns
         # `(init_args, signature, opcode)`.
         for signature in signatures:
-            self.init_args = kwargs
             self.signature = signature
             opcode_format = signature["opcode"]
             argument_format = signature["signature"]
@@ -155,6 +157,10 @@ class Mnemonic:
             name=self.__class__.__name__,
             args=", ".join(
                 "{}={}".format(name, value)
-                for name, value in zip(self.signature, self.init_args)
+                for name, value in (
+                    zip(self.signature["signature"], self._init_args)
+                    if self._init_args
+                    else self._init_kwargs.items()
+                )
             )
         )

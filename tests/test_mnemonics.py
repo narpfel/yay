@@ -198,3 +198,20 @@ def test_INC():
         0b00000110,
         0b10100011
     ])
+
+
+def test_repr():
+    add = None
+    class Test(Program):
+        def main(self):
+            nonlocal add
+            add = ADD(at(R1))
+    Test().to_binary()
+    assert repr(add) == "ADD(indirect=IR1)"
+
+    class Test(Program):
+        def main(self):
+            nonlocal add
+            add = ADD(direct=Byte(42))
+    Test().to_binary()
+    assert repr(add) == "ADD(direct=Byte(42))"
