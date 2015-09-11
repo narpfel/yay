@@ -28,14 +28,13 @@ def get_bit(number, bit):
     return (number >> bit) & 1
 
 
-def make_mnemonic(name, signatures, signature_contents):
+def make_mnemonic(name, signatures):
     def __init__(self, *args, **kwargs):
         try:
             super_args = {"auto": kwargs.pop("auto")}
         except KeyError:
             super_args = {}
         Mnemonic.__init__(self, **super_args)
-        self._signature_contents = signature_contents
 
         self._init_args = args
         self._init_kwargs = kwargs
@@ -45,36 +44,14 @@ def make_mnemonic(name, signatures, signature_contents):
                 "Mixing of positional and keyword arguments is not allowed."
             )
 
-        # TODO: Refactor this `for` loop into a method/function that returns
-        # `(init_args, signature, opcode)`.
-        for signature in signatures:
-            self.signature = signature
-            opcode_format = signature["opcode"]
-            argument_format = signature["signature"]
-
-            if argument_format and self.matches_kwargs(kwargs, argument_format):
-                self.opcode = self.opcode_from_kwargs(
-                    opcode_format, kwargs
-                )
-                break
-            elif self.matches_args(args, argument_format):
-                self.opcode = self.opcode_from_args(
-                    opcode_format, argument_format, args
-                )
-                break
-        else:
-            raise WrongSignatureException(
-                "Cannot call {} with this signature: {!r}, {!r}".format(
-                    self.__class__.__name__, args, kwargs
-                )
-            )
+        self.signature, self.opcode = self.find_opcode(args, kwargs, signatures)
 
     return type(name, (Mnemonic, ), {"__init__": __init__})
 
 
 def make_mnemonics(config):
     return {
-        name: make_mnemonic(name, signatures, config["signature_contents"])
+        name: make_mnemonic(name, signatures)
         for name, signatures in config["mnemonics"].items()
     }
 
@@ -91,6 +68,25 @@ class Mnemonic:
     @property
     def size(self):
         return len(self.opcode)
+
+    def find_opcode(self, args, kwargs, signatures):
+        for signature in signatures:
+            opcode_format = signature["opcode"]
+            argument_format = signature["signature"]
+
+            if argument_format and self.matches_kwargs(kwargs, argument_format):
+                return signature, self.opcode_from_kwargs(
+                    opcode_format, kwargs
+                )
+            elif self.matches_args(args, argument_format):
+                return signature, self.opcode_from_args(
+                    opcode_format, argument_format, args
+                )
+        raise WrongSignatureException(
+            "Cannot call {} with this signature: {!r}, {!r}".format(
+                self.__class__.__name__, args, kwargs
+            )
+        )
 
     def matches_args(self, args, argument_format):
         return len(args) == len(argument_format) and all(
@@ -136,7 +132,7 @@ class Mnemonic:
                 short_to_argname = reverse_dict({
                     # TODO: Better name for `value`.
                     argname: value["short"]
-                    for argname, value in self._signature_contents.items()
+                    for argname, value in self.program.cpu["signature_contents"].items()
                     if value["short"] is not None
                 })
                 result = 0
