@@ -44,9 +44,13 @@ def make_mnemonic(name, signatures):
                 "Mixing of positional and keyword arguments is not allowed."
             )
 
-        self.signature, self.opcode = self.find_opcode(args, kwargs, signatures)
+        self.signature, self.opcode = self.find_opcode(args, kwargs)
 
-    return type(name, (Mnemonic, ), {"__init__": __init__})
+    return type(
+        name,
+        (Mnemonic, ),
+        dict(__init__=__init__, signatures=signatures)
+    )
 
 
 def make_mnemonics(config):
@@ -69,8 +73,8 @@ class Mnemonic:
     def size(self):
         return len(self.opcode)
 
-    def find_opcode(self, args, kwargs, signatures):
-        for signature in signatures:
+    def find_opcode(self, args, kwargs):
+        for signature in self.signatures:
             opcode_format = signature["opcode"]
             argument_format = signature["signature"]
 
