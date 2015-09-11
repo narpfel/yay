@@ -29,27 +29,10 @@ def get_bit(number, bit):
 
 
 def make_mnemonic(name, signatures):
-    def __init__(self, *args, **kwargs):
-        try:
-            super_args = {"auto": kwargs.pop("auto")}
-        except KeyError:
-            super_args = {}
-        Mnemonic.__init__(self, **super_args)
-
-        self._init_args = args
-        self._init_kwargs = kwargs
-
-        if args and kwargs:
-            raise WrongSignatureException(
-                "Mixing of positional and keyword arguments is not allowed."
-            )
-
-        self.signature, self.opcode = self.find_opcode(args, kwargs)
-
     return type(
         name,
         (Mnemonic, ),
-        dict(__init__=__init__, signatures=signatures)
+        dict(signatures=signatures)
     )
 
 
@@ -61,7 +44,19 @@ def make_mnemonics(config):
 
 
 class Mnemonic:
-    def __init__(self, auto=True):
+    def __init__(self, *args, **kwargs):
+        auto = kwargs.pop("auto", True)
+
+        self._init_args = args
+        self._init_kwargs = kwargs
+
+        if args and kwargs:
+            raise WrongSignatureException(
+                "Mixing of positional and keyword arguments is not allowed."
+            )
+
+        self.signature, self.opcode = self.find_opcode(args, kwargs)
+
         if auto:
             self.program.append(self)
 

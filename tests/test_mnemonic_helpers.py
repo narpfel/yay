@@ -16,13 +16,13 @@ globals().update(make_cpu("AT89S8253")["registers"])
 
 
 @fixture
-def test_mnemonic():
-    mnemonic = Mnemonic(auto=False)
+def test_mnemonic(mocker):
+    mocker.patch("yay.mnemonics.Mnemonic.__init__", return_value=None)
+    mnemonic = Mnemonic()
     class ProgramMock:
         cpu = {"matchers": {"matchers": matchers}}
     mnemonic.program = ProgramMock
     return mnemonic
-
 
 
 def test_matches_args(test_mnemonic):
