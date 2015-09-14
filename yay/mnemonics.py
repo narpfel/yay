@@ -2,7 +2,7 @@ from functools import partial
 import re
 
 from yay.helpers import (
-    reverse_dict, InvalidConfigError, WrongSignatureException, twos_complement
+    InvalidConfigError, WrongSignatureException, twos_complement
 )
 
 
@@ -128,16 +128,10 @@ class Mnemonic:
                 # Does this promote subtle bugs in production code?
                 return int(try_match_byte(byte_format[0], kwargs))
             elif len(byte_format) == 8:
-                short_to_argname = reverse_dict({
-                    # TODO: Better name for `value`.
-                    argname: value["short"]
-                    for argname, value in self.program.cpu["signature_contents"].items()
-                    if value["short"] is not None
-                })
                 result = 0
                 for digit, bit_format in enumerate(reversed(byte_format)):
                     result |= try_match_bit(
-                        bit_format, short_to_argname, kwargs
+                        bit_format, self.program.cpu["short_to_argname"], kwargs
                     ) << digit
                 return result
             else:

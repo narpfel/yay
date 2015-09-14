@@ -2,7 +2,9 @@ import os.path
 from pathlib import Path
 from importlib import import_module
 
-from yay.helpers import read_config, config_filename, recursive_merge
+from yay.helpers import (
+    read_config, config_filename, recursive_merge, reverse_dict
+)
 from yay.mnemonics import make_mnemonics
 
 
@@ -29,6 +31,14 @@ def _replace_imports(section, default_from):
         section[name] = _read_import_spec(import_spec, default_from)
 
 
+def short_to_argname(signature_contents):
+    return reverse_dict({
+        argname: argspec["short"]
+        for argname, argspec in signature_contents.items()
+        if argspec["short"] is not None
+    })
+
+
 def read_cpu_config(config_name):
     config = read_config(config_name)
 
@@ -40,6 +50,9 @@ def read_cpu_config(config_name):
 
     for name, default in config.pop("importing", {}).items():
         _replace_imports(config[name], default)
+
+    if "signature_contents" in config:
+        config["short_to_argname"] = short_to_argname(config["signature_contents"])
 
     return config
 
