@@ -89,10 +89,7 @@ class Mnemonic:
 
     def matches_args(self, args, argument_format):
         return len(args) == len(argument_format) and all(
-            getattr(
-                self.program.cpu["matchers"]["matchers"],
-                "is_{}".format(name)
-            )(argument)
+            self.program.matches(name, argument)
             for name, argument in zip(argument_format, args)
         )
 

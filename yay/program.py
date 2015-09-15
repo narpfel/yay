@@ -39,6 +39,12 @@ class Program(metaclass=ProgramMeta):
     def add_label(self, label):
         self.labels[label] = self.position
 
+    def matches(self, type, value):
+        return getattr(
+            self.cpu["matchers"]["matchers"],
+            "is_{}".format(type)
+        )(value)
+
     def to_binary(self):
         self.main()
         return b"".join(opcode.opcode for opcode in self._opcodes)

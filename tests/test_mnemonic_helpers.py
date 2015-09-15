@@ -2,6 +2,7 @@ import pytest
 from pytest import raises, fixture
 
 from yay.mnemonics import Mnemonic
+from yay.program import Program
 from yay.cpu import make_cpu
 from yay.cpus.MCS_51 import IndirectRegister, Byte, at, DptrOffset, matchers
 from yay.helpers import InvalidRegisterError
@@ -18,11 +19,10 @@ globals().update(make_cpu("AT89S8253")["registers"])
 @fixture
 def test_mnemonic(mocker):
     mocker.patch("yay.mnemonics.Mnemonic.__init__", return_value=None)
-    mnemonic = Mnemonic()
-    class ProgramMock:
-        cpu = {"matchers": {"matchers": matchers}}
-    mnemonic.program = ProgramMock
-    return mnemonic
+    class TestProgram(Program, cpu="MCS_51"):
+        pass
+    TestMnemonic = Mnemonic.bind_program(TestProgram())
+    return TestMnemonic()
 
 
 def test_matches_args(test_mnemonic):
