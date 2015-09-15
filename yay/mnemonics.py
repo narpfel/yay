@@ -96,20 +96,17 @@ class Mnemonic:
             for name, argument in zip(argument_format, args)
         )
 
-
     def matches_kwargs(self, kwargs, argument_format):
         return set(kwargs) == set(argument_format) and self.matches_args(
             [kwargs[argname] for argname in argument_format],
             argument_format,
         )
 
-
     def opcode_from_args(self, opcode_format, argument_format, args):
         return self.opcode_from_kwargs(
             opcode_format,
             dict(zip(argument_format, args)),
         )
-
 
     def opcode_from_kwargs(self, opcode_format, kwargs):
         return bytes(
@@ -119,7 +116,6 @@ class Mnemonic:
             )
             for byte_format in opcode_format
         )
-
 
     def process_byte(self, byte_format, kwargs):
         try:
