@@ -28,7 +28,7 @@ def is_immediate16(candidate):
 
 # TODO: support labels
 def is_relative(candidate):
-    return candidate in range(2 ** 8)
+    return candidate in range(-2 ** 7, 2 ** 7 - 1)
 
 
 def is_addr11(candidate):
