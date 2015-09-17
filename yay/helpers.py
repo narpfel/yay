@@ -1,4 +1,5 @@
-from functools import wraps
+from functools import wraps, lru_cache
+from copy import deepcopy
 from types import FunctionType, MethodType
 from collections.abc import Mapping
 from pkg_resources import resource_filename
@@ -26,9 +27,14 @@ def config_filename(config_name):
     return resource_filename("yay", config_name)
 
 
-def read_config(config_name):
+@lru_cache()
+def _read_config_cached(config_name):
     with open(config_name) as yaml_file:
         return load(yaml_file, Loader=Loader)
+
+
+def read_config(config_name):
+    return deepcopy(_read_config_cached(config_name))
 
 
 def reverse_dict(mapping):
