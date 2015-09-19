@@ -30,6 +30,8 @@ pip-log.txt
 .tox
 nosetests.xml
 htmlcov
+# pytest cache directory
+.cache/
 
 # Translations
 *.mo
