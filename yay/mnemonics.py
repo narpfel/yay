@@ -44,6 +44,9 @@ def make_mnemonics(config):
 
 
 class Mnemonic:
+    program = None
+    signatures = None
+
     def __init__(self, *args, **kwargs):
         auto = kwargs.pop("auto", True)
 
