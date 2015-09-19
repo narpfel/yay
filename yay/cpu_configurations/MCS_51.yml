@@ -7,6 +7,9 @@ signature_contents:
     direct:
         length: 8
         short: null
+    direct_dest:
+        length: 8
+        short: null
     register:
         length: 3
         short: "r"
