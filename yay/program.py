@@ -41,7 +41,7 @@ class Program(metaclass=ProgramMeta):
 
     def matches(self, type, value):
         return getattr(
-            self.cpu["matchers"]["matchers"],
+            self.cpu["parse_helpers"]["matchers"],
             "is_{}".format(type)
         )(value)
 

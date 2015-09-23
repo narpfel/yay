@@ -695,14 +695,14 @@ additional_names:
     Label:
         import: "Label"
 
-matchers:
+parse_helpers:
     matchers:
         import: "matchers"
 
 importing:
     additional_names: "yay.cpus.MCS_51"
     registers: "yay.cpus.MCS_51"
-    matchers: "yay.cpus.MCS_51"
+    parse_helpers: "yay.cpus.MCS_51"
 
 all:
     - "mnemonics"
