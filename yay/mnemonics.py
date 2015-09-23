@@ -119,22 +119,20 @@ class Mnemonic:
         )
 
     def process_byte(self, byte_format):
-        try:
-            if len(byte_format) == 1:
-                # TODO: Should arguments unconditionally be converted to `int`?
-                # Does this promote subtle bugs in production code?
-                return int(self.try_match_byte(byte_format[0]))
-            elif len(byte_format) == 8:
-                result = 0
-                for digit, bit_format in enumerate(reversed(byte_format)):
-                    result |= self.try_match_bit(bit_format) << digit
-                return result
-            else:
-                raise ValueError("`byte_format` length must be either 1 or 8.")
-        except ValueError as err:
+        if len(byte_format) == 1:
+            # TODO: Should arguments unconditionally be converted to `int`?
+            # Does this promote subtle bugs in production code?
+            return int(self.try_match_byte(byte_format[0]))
+        elif len(byte_format) == 8:
+            result = 0
+            for digit, bit_format in enumerate(reversed(byte_format)):
+                result |= self.try_match_bit(bit_format) << digit
+            return result
+        else:
             raise InvalidConfigError(
-                "Invalid configuration: {!r}".format(byte_format)
-            ) from err
+                "`byte_format` length must be either 1 or 8, not {}"
+                .format(len(byte_format))
+            )
 
     def try_match_byte(self, byte_format):
         try:
