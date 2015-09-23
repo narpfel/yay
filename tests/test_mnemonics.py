@@ -26,7 +26,7 @@ def test_insert_in_opcodes():
 def test_ACALL():
     class Test(Program):
         def main(self):
-            acall = ACALL(addr11=1234)
+            acall = ACALL(1234)
     assert Test().to_binary() == bytes([0b10010001, 0b11010010])
 
 
