@@ -47,10 +47,7 @@ class Mnemonic:
                 args
             )
 
-        self.opcode = self.opcode_from_kwargs(
-            self.signature,
-            self._init_kwargs
-        )
+        self.opcode = self.find_opcode()
 
         if auto:
             self.program.append(self)
@@ -112,32 +109,25 @@ class Mnemonic:
     def kwargs_from_args(argument_format, args):
         return dict(zip(argument_format, args))
 
-    def opcode_from_kwargs(self, signature, kwargs):
+    def find_opcode(self):
         return bytes(
             twos_complement(
-                self.process_byte(byte_format, kwargs, signature),
+                self.process_byte(byte_format),
                 8
             )
-            for byte_format in signature["opcode"]
+            for byte_format in self.signature["opcode"]
         )
 
-    def process_byte(self, byte_format, kwargs, signature):
+    def process_byte(self, byte_format):
         try:
             if len(byte_format) == 1:
                 # TODO: Should arguments unconditionally be converted to `int`?
                 # Does this promote subtle bugs in production code?
-                return int(
-                    self.try_match_byte(byte_format[0], kwargs, signature)
-                )
+                return int(self.try_match_byte(byte_format[0]))
             elif len(byte_format) == 8:
                 result = 0
                 for digit, bit_format in enumerate(reversed(byte_format)):
-                    result |= self.try_match_bit(
-                        bit_format,
-                        self.program.cpu["short_to_argname"],
-                        kwargs,
-                        signature
-                    ) << digit
+                    result |= self.try_match_bit(bit_format) << digit
                 return result
             else:
                 raise ValueError("`byte_format` length must be either 1 or 8.")
@@ -146,23 +136,23 @@ class Mnemonic:
                 "Invalid configuration: {!r}".format(byte_format)
             ) from err
 
-    def try_match_byte(self, byte_format, kwargs, signature):
+    def try_match_byte(self, byte_format):
         try:
             return int(byte_format)
         except ValueError:
-            alternatives_taken = signature["alternatives_taken"]
+            alternatives_taken = self.signature["alternatives_taken"]
             if byte_format in alternatives_taken:
                 from_type = alternatives_taken[byte_format]
                 return self.program.convert(
                     self,
                     from_type,
                     byte_format,
-                    kwargs[from_type]
+                    self._init_kwargs[from_type]
                 )
             else:
-                return kwargs[byte_format]
+                return self._init_kwargs[byte_format]
 
-    def try_match_bit(self, bit_format, short_to_argname, kwargs, signature):
+    def try_match_bit(self, bit_format):
         try:
             match = re.match(r"(\w)(\d+)", bit_format)
         except TypeError:
@@ -170,18 +160,18 @@ class Mnemonic:
         else:
             short = match.group(1)
             digit = int(match.group(2))
-            typename = short_to_argname[short]
-            if typename not in kwargs:
-                type_to_alternative = signature["alternatives_taken"]
+            typename = self.program.cpu["short_to_argname"][short]
+            if typename not in self._init_kwargs:
+                type_to_alternative = self.signature["alternatives_taken"]
                 from_type = type_to_alternative[typename]
                 value = self.program.convert(
                     self,
                     from_type,
                     typename,
-                    kwargs[from_type]
+                    self._init_kwargs[from_type]
                 )
             else:
-                value = kwargs[typename]
+                value = self._init_kwargs[typename]
             return get_bit(int(value), digit)
 
     def __repr__(self):
