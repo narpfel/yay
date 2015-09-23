@@ -150,12 +150,14 @@ class Mnemonic:
         try:
             return int(byte_format)
         except ValueError:
-            if byte_format in signature["alternatives_taken"]:
+            alternatives_taken = signature["alternatives_taken"]
+            if byte_format in alternatives_taken:
+                from_type = alternatives_taken[byte_format]
                 return self.program.convert(
                     self,
+                    from_type,
                     byte_format,
-                    signature["alternatives_taken"][byte_format],
-                    kwargs[byte_format]
+                    kwargs[from_type]
                 )
             else:
                 return kwargs[byte_format]

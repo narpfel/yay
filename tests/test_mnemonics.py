@@ -178,6 +178,16 @@ def test_AJMP_different_blocks():
         Test().to_binary()
 
 
+def test_SJMP_label():
+    class Test(Program):
+        def main(self):
+            Label("begin")
+            SJMP("begin")
+
+    assert Test().to_binary() == bytes([0b10000000, 0b11111110])
+
+
+
 def test_AND():
     class Test(Program):
         def main(self):
