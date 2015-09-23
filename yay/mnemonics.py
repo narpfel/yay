@@ -157,22 +157,10 @@ class Mnemonic:
             match = re.match(r"(\w)(\d+)", bit_format)
         except TypeError:
             return int(bit_format)
-        else:
-            short = match.group(1)
-            digit = int(match.group(2))
-            typename = self.program.cpu["short_to_argname"][short]
-            if typename not in self._init_kwargs:
-                type_to_alternative = self.signature["alternatives_taken"]
-                from_type = type_to_alternative[typename]
-                value = self.program.convert(
-                    self,
-                    from_type,
-                    typename,
-                    self._init_kwargs[from_type]
-                )
-            else:
-                value = self._init_kwargs[typename]
-            return get_bit(int(value), digit)
+        short = match.group(1)
+        digit = int(match.group(2))
+        typename = self.program.cpu["short_to_argname"][short]
+        return get_bit(int(self.try_match_byte(typename)), digit)
 
     def __repr__(self):
         return "{name}({args})".format(
