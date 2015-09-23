@@ -39,11 +39,38 @@ class Program(metaclass=ProgramMeta):
     def add_label(self, label):
         self.labels[label] = self.position
 
-    def matches(self, type, value):
+    def matches(self, typename, value):
+        possible_matchers = [typename]
+        possible_matchers.extend(
+            self.cpu["signature_contents"][typename].get("alternatives", [])
+        )
+        for matcher_type in possible_matchers:
+            if self._matches_specific(matcher_type, value):
+                return True, matcher_type
+        return False, ""
+
+    def _matches_specific(self, typename, value, from_alternative=None):
+        args = [value]
+        if from_alternative is not None:
+            args.append(from_alternative)
         return getattr(
             self.cpu["parse_helpers"]["matchers"],
-            "is_{}".format(type)
-        )(value)
+            "is_{}".format(typename)
+        )(*args)
+
+    def convert(self, mnemonic, from_, to, value):
+        converted = getattr(
+            self.cpu["parse_helpers"]["converters"],
+            "{}_from_{}".format(to, from_)
+        )(mnemonic, value)
+        if not self._matches_specific(to, converted, from_alternative=True):
+            raise ValueError(
+                "Could not match {!r} (converted from {!r} ({!r})) as type {!r}"
+                .format(
+                    converted, value, from_, to
+                )
+            )
+        return converted
 
     def to_binary(self):
         self.main()

@@ -1,5 +1,5 @@
 from yay.cpus.MCS_51 import (
-    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset, Carry
+    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset, Carry, Label
 )
 
 
@@ -26,16 +26,19 @@ def is_immediate16(candidate):
     return candidate in range(2 ** 16)
 
 
-# TODO: support labels
-def is_relative(candidate):
-    return candidate in range(-2 ** 7, 2 ** 7 - 1)
+def is_label(candidate):
+    return isinstance(candidate, (str, Label))
 
 
-def is_addr11(candidate):
-    return candidate in range(2 ** 11)
+def is_relative(candidate, from_alternative=False):
+    return from_alternative and candidate in range(-2 ** 7, 2 ** 7 - 1)
 
 
-def is_addr16(candidate):
+def is_addr11(candidate, from_alternative=False):
+    return from_alternative and candidate in range(2 ** 11)
+
+
+def is_addr16(candidate, from_alternative=False):
     return candidate in range(2 ** 16)
 
 

@@ -1,4 +1,4 @@
-from pytest import raises
+from pytest import raises, mark
 
 from yay.program import Program as _Program
 from yay.helpers import InvalidRegisterError, WrongSignatureException
@@ -142,12 +142,14 @@ def test_AJMP():
     ])
 
 
-def test_AJMP_overflow():
+@mark.xfail(reason="TODO: kwargs and alternatives don’t work together yet.")
+def test_AJMP_kwargs():
     class Test(Program):
         def main(self):
-            AJMP(3000)
-    with raises(WrongSignatureException):
-        Test().to_binary()
+            AJMP(addr16=42)
+    assert Test().to_binary() == bytes([
+        0b00000001, 0b00101010,
+    ])
 
 
 def test_AJMP_fails_with_negative_argument():
@@ -155,6 +157,24 @@ def test_AJMP_fails_with_negative_argument():
         def main(self):
             AJMP(-42)
     with raises(WrongSignatureException):
+        Test().to_binary()
+
+
+def test_AJMP_different_blocks():
+    class Test(Program):
+        def main(self):
+            AJMP(3000)
+    with raises(ValueError):
+        Test().to_binary()
+
+    class Test(Program):
+        def main(self):
+            for _ in range(2 ** 11 - 4):
+                NOP()
+            AJMP(2 ** 11 + 2)
+            for _ in range(20):
+                NOP()
+    with raises(ValueError):
         Test().to_binary()
 
 

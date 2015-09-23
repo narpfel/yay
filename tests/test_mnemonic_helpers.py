@@ -26,6 +26,8 @@ def test_mnemonic(mocker):
 
 
 def test_matches_args(test_mnemonic):
+    # TODO: Should test `cpus.MCS_51.match_helpers` directly (without
+    # mnemonic and program)
     tests = [
         [[R0], ["register"], True],
         [[R0, Byte(42)], ["register"], False],
@@ -42,13 +44,18 @@ def test_matches_args(test_mnemonic):
         [[R4], ["indirect"], False],
         [[at(R0)], ["register"], False],
         [[P1], ["direct"], True],
+        # Nothing directly matches `relative`
+        # TODO: Should be `False`!
+        [[120], ["relative"], True],
+        [[120], ["addr16"], True]
     ]
     for args, argument_format, expected in tests:
-        assert bool(test_mnemonic.matches_args(args, argument_format)) is expected
+        matches, _ = test_mnemonic.matches_args(args, argument_format)
+        assert bool(matches) is expected
 
 
 def test_int_not_matches_direct(test_mnemonic):
-    assert not test_mnemonic.matches_args([42], ["direct"])
+    assert not test_mnemonic.matches_args([42], ["direct"])[0]
 
 
 def test_at():
@@ -74,4 +81,5 @@ def test_matches_kwargs(test_mnemonic):
     ]
 
     for kwargs, argument_format, expected in tests:
-        assert bool(test_mnemonic.matches_kwargs(kwargs, argument_format)) is expected
+        matches, _ = test_mnemonic.matches_kwargs(kwargs, argument_format)
+        assert bool(matches) is expected

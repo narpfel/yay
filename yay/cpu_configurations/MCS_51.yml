@@ -25,12 +25,20 @@ signature_contents:
     relative:
         length: 8
         short: null
+        alternatives:
+            - "label"
+            - "addr16"
     addr11:
         length: 11
         short: "a"
+        alternatives:
+            - "label"
+            - "addr16"
     addr16:
         length: 16
         short: "l"
+        alternatives:
+            - "label"
     accu:
         length: 0
         short: null
@@ -698,6 +706,8 @@ additional_names:
 parse_helpers:
     matchers:
         import: "matchers"
+    converters:
+        import: "converters"
 
 importing:
     additional_names: "yay.cpus.MCS_51"
