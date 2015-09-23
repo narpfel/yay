@@ -70,13 +70,13 @@ class Mnemonic:
             argument_format = signature["signature"]
             matches, alternatives_taken = matcher(argument_format)
             if matches:
-                actual_signature = dict(signature)
-                actual_signature["alternatives_taken"] = alternatives_taken
-                actual_signature["signature"] = [
+                signature = dict(signature)
+                signature["alternatives_taken"] = alternatives_taken
+                signature["signature"] = [
                     alternatives_taken.get(name, name)
-                    for name in actual_signature["signature"]
+                    for name in signature["signature"]
                 ]
-                return actual_signature
+                return signature
 
         raise WrongSignatureException(
             "Cannot call {} with this signature: {!r}, {!r}".format(
