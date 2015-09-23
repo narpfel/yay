@@ -7,7 +7,7 @@ class Accumulator:
             return DptrOffset()
         elif isinstance(other, PC):
             return PcOffset()
-        raise NotImplemented
+        return NotImplemented
 
 
 class DPTR:
