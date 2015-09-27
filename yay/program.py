@@ -75,3 +75,6 @@ class Program(metaclass=ProgramMeta):
     def to_binary(self):
         self.main()
         return b"".join(opcode.opcode for opcode in self._opcodes)
+
+    def get_position(self, mnemonic):
+        return self._opcodes.index(mnemonic)

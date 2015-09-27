@@ -60,6 +60,10 @@ class Mnemonic:
     def size(self):
         return len(self.signature["opcode"])
 
+    @property
+    def position(self):
+        return self.program.get_position(self)
+
     def find_matching_signature(self, args, kwargs):
         if kwargs:
             matcher = partial(self.matches_kwargs, kwargs)
