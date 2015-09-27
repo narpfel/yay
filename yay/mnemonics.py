@@ -47,7 +47,7 @@ class Mnemonic:
                 args
             )
 
-        self.opcode = self.find_opcode()
+        self._opcode = None
 
         if auto:
             self.program.append(self)
@@ -59,6 +59,12 @@ class Mnemonic:
     @property
     def size(self):
         return len(self.signature["opcode"])
+
+    @property
+    def opcode(self):
+        if self._opcode is None:
+            self._opcode = self.find_opcode()
+        return self._opcode
 
     @property
     def position(self):

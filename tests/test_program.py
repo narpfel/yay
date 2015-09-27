@@ -164,6 +164,15 @@ def test_missing_self_fails():
         test.to_binary()
 
 
+def test_label_used_before_declared():
+    class Test(Program):
+        def main(self):
+            SJMP("label")
+            Label("label")
+
+    assert Test().to_binary() == bytes([0b10000000, 0b00000000])
+
+
 @mark.skipif(not has_sdcc(), reason="sdcc not found on `$PATH`.")
 def test_compare_with_sdcc(tmpdir):
     class Test(_Program, cpu="MCS_51"):
