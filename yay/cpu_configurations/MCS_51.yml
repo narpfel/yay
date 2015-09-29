@@ -535,127 +535,52 @@ mnemonics:
               - [0b0110_0100]
               - ["immediate"]
 
+sfrs:
+    import: "SFR"
+    with_key: true
+    call_many:
+        P0: [0x80]
+        SP: [0x81]
+        DP0L: [0x82]
+        DP0H: [0x83]
+        DP1L: [0x84]
+        DP1H: [0x85]
+        SPDR: [0x86]
+        PCON: [0x87]
+        TCON: [0x88]
+        TMOD: [0x89]
+        TL0: [0x8A]
+        TL1: [0x8B]
+        TH0: [0x8C]
+        TH1: [0x8D]
+        AUXR: [0x8E]
+        CLKREG: [0x8F]
+        P1: [0x90]
+        EECON: [0x96]
+        SCON: [0x98]
+        SBUF: [0x99]
+        P2: [0xA0]
+        WDTRST: [0xA6]
+        WDTCON: [0xA7]
+        IE: [0xA8]
+        SADDR: [0xA9]
+        SPSR: [0xAA]
+        P3: [0xB0]
+        IPH: [0xB7]
+        IP: [0xB8]
+        SADEN: [0xB9]
+        T2CON: [0xC8]
+        T2MOD: [0xC9]
+        RCAP2L: [0xCA]
+        RCAP2H: [0xCB]
+        TL2: [0xCC]
+        TH2: [0xCD]
+        PSW: [0xD0]
+        SPCR: [0xD5]
+        ACC: [0xE0]
+        B: [0xF0]
+
 registers:
-    P0:
-        import: "SFR"
-        call: ["P0", 0x80]
-    SP:
-        import: "SFR"
-        call: ["SP", 0x81]
-    DP0L:
-        import: "SFR"
-        call: ["DP0L", 0x82]
-    DP0H:
-        import: "SFR"
-        call: ["DP0H", 0x83]
-    DP1L:
-        import: "SFR"
-        call: ["DP1L", 0x84]
-    DP1H:
-        import: "SFR"
-        call: ["DP1H", 0x85]
-    SPDR:
-        import: "SFR"
-        call: ["SPDR", 0x86]
-    PCON:
-        import: "SFR"
-        call: ["PCON", 0x87]
-    TCON:
-        import: "SFR"
-        call: ["TCON", 0x88]
-    TMOD:
-        import: "SFR"
-        call: ["TMOD", 0x89]
-    TL0:
-        import: "SFR"
-        call: ["TL0", 0x8A]
-    TL1:
-        import: "SFR"
-        call: ["TL1", 0x8B]
-    TH0:
-        import: "SFR"
-        call: ["TH0", 0x8C]
-    TH1:
-        import: "SFR"
-        call: ["TH1", 0x8D]
-    AUXR:
-        import: "SFR"
-        call: ["AUXR", 0x8E]
-    CLKREG:
-        import: "SFR"
-        call: ["CLKREG", 0x8F]
-    P1:
-        import: "SFR"
-        call: ["P1", 0x90]
-    EECON:
-        import: "SFR"
-        call: ["EECON", 0x96]
-    SCON:
-        import: "SFR"
-        call: ["SCON", 0x98]
-    SBUF:
-        import: "SFR"
-        call: ["SBUF", 0x99]
-    P2:
-        import: "SFR"
-        call: ["P2", 0xA0]
-    WDTRST:
-        import: "SFR"
-        call: ["WDTRST", 0xA6]
-    WDTCON:
-        import: "SFR"
-        call: ["WDTCON", 0xA7]
-    IE:
-        import: "SFR"
-        call: ["IE", 0xA8]
-    SADDR:
-        import: "SFR"
-        call: ["SADDR", 0xA9]
-    SPSR:
-        import: "SFR"
-        call: ["SPSR", 0xAA]
-    P3:
-        import: "SFR"
-        call: ["P3", 0xB0]
-    IPH:
-        import: "SFR"
-        call: ["IPH", 0xB7]
-    IP:
-        import: "SFR"
-        call: ["IP", 0xB8]
-    SADEN:
-        import: "SFR"
-        call: ["SADEN", 0xB9]
-    T2CON:
-        import: "SFR"
-        call: ["T2CON", 0xC8]
-    T2MOD:
-        import: "SFR"
-        call: ["T2MOD", 0xC9]
-    RCAP2L:
-        import: "SFR"
-        call: ["RCAP2L", 0xCA]
-    RCAP2H:
-        import: "SFR"
-        call: ["RCAP2H", 0xCB]
-    TL2:
-        import: "SFR"
-        call: ["TL2", 0xCC]
-    TH2:
-        import: "SFR"
-        call: ["TH2", 0xCD]
-    PSW:
-        import: "SFR"
-        call: ["PSW", 0xD0]
-    SPCR:
-        import: "SFR"
-        call: ["SPCR", 0xD5]
-    ACC:
-        import: "SFR"
-        call: ["ACC", 0xE0]
-    B:
-        import: "SFR"
-        call: ["B", 0xF0]
     A:
         import: "Accumulator"
         call: []
@@ -772,11 +697,13 @@ parse_helpers:
 importing:
     additional_names: "yay.cpus.MCS_51"
     registers: "yay.cpus.MCS_51"
+    sfrs: "yay.cpus.MCS_51"
     parse_helpers: "yay.cpus.MCS_51"
     named_bits: "yay.cpus.MCS_51"
 
 all:
     - "mnemonics"
     - "registers"
+    - "sfrs"
     - "additional_names"
     - "named_bits"

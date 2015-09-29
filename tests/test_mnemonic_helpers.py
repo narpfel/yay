@@ -9,7 +9,9 @@ from yay.helpers import InvalidRegisterError
 
 
 # TODO: Dirty hack!
-globals().update(make_cpu("AT89S8253")["registers"])
+cpu = make_cpu("AT89S8253")
+globals().update(cpu["registers"])
+globals().update(cpu["sfrs"])
 
 # TODO for @A+DPTR (also covered by the hack above)
 # DPTR = AT89S8253.DPTR

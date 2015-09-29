@@ -1,63 +1,24 @@
 inherit_from: "MCS_51"
 
-registers:
-    DP0L:
-        import: "SFR"
-        call: ["DP0L", 0x82]
-    DP0H:
-        import: "SFR"
-        call: ["DP0H", 0x83]
-    DP1L:
-        import: "SFR"
-        call: ["DP1L", 0x84]
-    DP1H:
-        import: "SFR"
-        call: ["DP1H", 0x85]
-    SPDR:
-        import: "SFR"
-        call: ["SPDR", 0x86]
-    CLKREG:
-        import: "SFR"
-        call: ["CLKREG", 0x8F]
-    EECON:
-        import: "SFR"
-        call: ["EECON", 0x96]
-    WDTRST:
-        import: "SFR"
-        call: ["WDTRST", 0xA6]
-    WDTCON:
-        import: "SFR"
-        call: ["WDTCON", 0xA7]
-    SADDR:
-        import: "SFR"
-        call: ["SADDR", 0xA9]
-    SPSR:
-        import: "SFR"
-        call: ["SPSR", 0xAA]
-    IPH:
-        import: "SFR"
-        call: ["IPH", 0xB7]
-    SADEN:
-        import: "SFR"
-        call: ["SADEN", 0xB9]
-    T2CON:
-        import: "SFR"
-        call: ["T2CON", 0xC8]
-    T2MOD:
-        import: "SFR"
-        call: ["T2MOD", 0xC9]
-    RCAP2L:
-        import: "SFR"
-        call: ["RCAP2L", 0xCA]
-    RCAP2H:
-        import: "SFR"
-        call: ["RCAP2H", 0xCB]
-    TL2:
-        import: "SFR"
-        call: ["TL2", 0xCC]
-    TH2:
-        import: "SFR"
-        call: ["TH2", 0xCD]
-    SPCR:
-        import: "SFR"
-        call: ["SPCR", 0xD5]
+sfrs:
+    call_many:
+        DP0L: [0x82]
+        DP0H: [0x83]
+        DP1L: [0x84]
+        DP1L: [0x85]
+        SPDR: [0x86]
+        CLKREG: [0x8F]
+        EECON: [0x96]
+        WDTRST: [0xA6]
+        WDTCON: [0xA7]
+        SADDR: [0xA9]
+        SPSR: [0xAA]
+        IPH: [0xB7]
+        SADEN: [0xB9]
+        T2CON: [0xC8]
+        T2MOD: [0xC9]
+        RCAP2L: [0xCA]
+        RCAP2H: [0xCB]
+        TL2: [0xCC]
+        TH2: [0xCD]
+        SPCR: [0xD5]
