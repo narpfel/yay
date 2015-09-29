@@ -5,7 +5,7 @@ from importlib import import_module
 from yay.helpers import (
     read_config, config_filename, recursive_merge, reverse_dict
 )
-from yay.mnemonics import make_mnemonics
+from yay.mnemonic import make_mnemonics
 
 
 def _import_object(from_, name):
