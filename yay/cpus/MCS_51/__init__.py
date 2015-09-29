@@ -91,6 +91,14 @@ class SFR(Byte):
             )
         super().__init__(byte_addr)
         self.name = name
+        self.bit_addressable = (
+            self.byte_addr >= 0x80 and not self.byte_addr % 8
+        )
+
+    def __getitem__(self, bit):
+        if not self.bit_addressable:
+            raise TypeError("{} is not bit addressable".format(self))
+        return Bit(self.byte_addr + bit)
 
     def __str__(self):
         return self.name
