@@ -119,6 +119,9 @@ class Bit:
     def __int__(self):
         return self.bit_addr
 
+    def __repr__(self):
+        return "Bit({})".format(self.bit_addr)
+
 
 class NotBit:
     def __init__(self, not_bit_addr):
@@ -127,11 +130,17 @@ class NotBit:
     def __int__(self):
         return self.not_bit_addr
 
+    def __repr__(self):
+        return "~Bit({})".format(self.not_bit_addr)
+
 
 class NamedBit(Bit):
     def __init__(self, name, bit_addr):
         super().__init__(bit_addr)
         self.name = name
+
+    def __repr__(self):
+        return "Bit(name={s.name!r}, bit_addr={s.bit_addr})".format(s=self)
 
 
 def at(register):
