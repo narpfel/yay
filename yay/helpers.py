@@ -1,6 +1,6 @@
 from functools import wraps
 from types import FunctionType, MethodType
-from collections.abc import MutableMapping
+from collections.abc import Mapping
 from pkg_resources import resource_filename
 
 from yaml import load
@@ -38,9 +38,7 @@ def reverse_dict(mapping):
 
 
 def recursive_merge(base, update):
-    if not (
-        isinstance(base, MutableMapping) and isinstance(update, MutableMapping)
-    ):
+    if not isinstance(base, Mapping) or not isinstance(update, Mapping):
         return update
 
     merged = dict(base)
