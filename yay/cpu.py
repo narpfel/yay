@@ -12,6 +12,19 @@ def _import_object(from_, name):
     return getattr(import_module(from_), name)
 
 
+def _call_one(obj, name, args, with_key):
+    if with_key:
+        args = [name] + args
+    return obj(*args)
+
+
+def _call_many(obj, call_spec, with_key):
+    return {
+        name: _call_one(obj, name, args, with_key)
+        for name, args in call_spec.items()
+    }
+
+
 def _read_import_spec(import_spec, default_from):
     try:
         name = import_spec["import"]
@@ -26,9 +39,29 @@ def _read_import_spec(import_spec, default_from):
         return imported
 
 
+def _replace_call_many_import(import_spec, default_from):
+    try:
+        name = import_spec["import"]
+    except (KeyError, TypeError):
+        # Not a valid `import_spec`, ignoring.
+        return
+    from_ = import_spec.get("from", default_from)
+    imported = _import_object(from_, name)
+    replacement = _call_many(
+        imported,
+        import_spec["call_many"],
+        import_spec.get("with_key", False)
+    )
+    import_spec.clear()
+    import_spec.update(replacement)
+
+
 def _replace_imports(section, default_from):
-    for name, import_spec in section.items():
-        section[name] = _read_import_spec(import_spec, default_from)
+    if "call_many" in section:
+        _replace_call_many_import(section, default_from)
+    else:
+        for name, import_spec in section.items():
+            section[name] = _read_import_spec(import_spec, default_from)
 
 
 def short_to_argname(signature_contents):

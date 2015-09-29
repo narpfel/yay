@@ -72,3 +72,35 @@ def test_read_cpu_config_import(tmpdir):
             },
         }
     }
+
+
+def test_call_many(tmpdir):
+    test_yml = tmpdir.join("test_call_many.yml")
+    test_yml.write(dedent(
+        """
+        foo:
+            import: "sub"
+            call_many:
+                bar: ["b", "a", "bar"]
+                foo: ["f", "b", "foo"]
+        bar:
+            import: "sub"
+            with_key: true
+            call_many:
+                b: ["a", "bar"]
+                f: ["b", "foo"]
+        importing:
+            foo: "re"
+            bar: "re"
+        """
+    ))
+    assert read_cpu_config(test_yml.strpath) == {
+        "foo": {
+            "bar": "aar",
+            "foo": "boo"
+        },
+        "bar": {
+            "b": "aar",
+            "f": "boo"
+        }
+    }
