@@ -693,6 +693,66 @@ registers:
         import: "PC"
         call: []
 
+named_bits:
+    import: "NamedBit"
+    with_key: true
+    call_many:
+        # from TCON (0x88)
+        IT0: [0x88]
+        IE0: [0x89]
+        IT1: [0x8A]
+        IE1: [0x8B]
+        TR0: [0x8C]
+        TF0: [0x8D]
+        TR1: [0x8E]
+        TF1: [0x8F]
+        # from SCON (0x98)
+        RI: [0x98]
+        TI: [0x99]
+        RB8: [0x9A]
+        TB8: [0x9B]
+        REN: [0x9C]
+        SM2: [0x9D]
+        SM1: [0x9E]
+        # `FE` and `SM0` are the same bit
+        FE: [0x9F]
+        SM0: [0x9F]
+        # from IE (0xA8)
+        EX0: [0xA8]
+        ET0: [0xA9]
+        EX1: [0xAA]
+        ET1: [0xAB]
+        ES: [0xAC]
+        ET2: [0xAE]
+        # IE[6] is reserved
+        EA: [0xAF]
+        # from IP (0xB8)
+        PX0: [0xB8]
+        PT0: [0xB9]
+        PX1: [0xBA]
+        PT1: [0xBB]
+        PS: [0xBC]
+        PT2: [0xBD]
+        # IP[6] and IP[7] are reserved
+        # from T2CON (0xC8)
+        CPRL2: [0xC8]
+        CT2: [0xC9]
+        TR2: [0xCA]
+        EXEN2: [0xCB]
+        TCLK: [0xCC]
+        RCLK: [0xCD]
+        EXF2: [0xCE]
+        TF2: [0xCF]
+        # from PSW (0xD0)
+        P: [0xD0]
+        # PSW[1] is reserved
+        OV: [0xD2]
+        RS0: [0xD3]
+        RS1: [0xD4]
+        F0: [0xD5]
+        AC: [0xD6]
+        CY: [0xD7]
+
 additional_names:
     at:
         import: "at"
@@ -713,8 +773,10 @@ importing:
     additional_names: "yay.cpus.MCS_51"
     registers: "yay.cpus.MCS_51"
     parse_helpers: "yay.cpus.MCS_51"
+    named_bits: "yay.cpus.MCS_51"
 
 all:
     - "mnemonics"
     - "registers"
     - "additional_names"
+    - "named_bits"

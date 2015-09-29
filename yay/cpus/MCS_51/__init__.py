@@ -128,6 +128,12 @@ class NotBit:
         return self.not_bit_addr
 
 
+class NamedBit(Bit):
+    def __init__(self, name, bit_addr):
+        super().__init__(bit_addr)
+        self.name = name
+
+
 def at(register):
     if isinstance(register, (DptrOffset, PcOffset)):
         return register
