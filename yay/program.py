@@ -1,10 +1,27 @@
 from contextlib import suppress
+from functools import partial
 
 from yay.helpers import inject_names
 from yay.cpu import make_cpu
 
 
+def macro(f, *, register):
+    # Make sure each macro has its own `__globals__` dict so `Program` can
+    # `update` it without affecting other global namespaces.
+    f = inject_names({})(f)
+    register.append(f)
+    return f
+
+
 class ProgramMeta(type):
+    @classmethod
+    def __prepare__(metacls, name, bases, **kwargs):
+        macros = []
+        return {
+            "_macros": macros,
+            "macro": partial(macro, register=macros)
+        }
+
     def __new__(cls, name, bases, namespace, **kwargs):
         return type.__new__(cls, name, bases, namespace)
 
@@ -28,6 +45,8 @@ class Program(metaclass=ProgramMeta):
                     self._cpu_namespace[name] = item
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
+        for macro in self._macros:
+            macro.__globals__.update(self._cpu_namespace)
 
         self.labels = {}
         self.position = 0

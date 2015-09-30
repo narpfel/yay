@@ -95,32 +95,33 @@ def test_mnemonics_in_method():
     assert test.to_binary() == bytes([0b00101011, 0b00100101, 42])
 
 
-@mark.skipif(should_skip, reason="Macros and subs not implemented yet.")
 def test_for_loop():
     class Test(Program):
-        @macro
         @contextmanager
+        @macro
         def loop(self, register, n):
             """Actual loop implementation?"""
-            MOVI(register, n)
-            LABEL("loop_head")
+            MOV(register, n)
+            Label("loop_head")
             yield
             DJNZ(register, "loop_head")
 
         def main(self):
-            CLR(A)
-            with loop(R7, 5):
+            CLR()
+            with self.loop(R7, 5):
                 ADD(R7)
 
-            # This shall expand to
-            #
-            # CLR(A)
-            # MOV(register, n)
-            # LABEL("loop_head")
-            # ADD(A, R7)
-            # DJNZ(R7, "loop_head")
+    # This shall expand to:
+    class Expected(Program):
+        def main(self):
+            CLR()
+            MOV(R7, 5)
+            Label("loop_head")
+            ADD(R7)
+            DJNZ(R7, "loop_head")
 
-    assert False
+    assert Test().to_binary() == Expected().to_binary()
+
 
 
 @mark.xfail(reason="Not sure if this should be implemented.")
