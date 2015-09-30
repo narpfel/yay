@@ -11,14 +11,14 @@ class ProgramMeta(type):
     def __init__(self, name, bases, namespace, **kwargs):
         type.__init__(self, name, bases, namespace)
         with suppress(KeyError):
-            self._cpu_spec = kwargs["cpu"]
+            self._cpu_name = kwargs["cpu"]
         self._opcode_destination = kwargs.get("opcode_destination", list)
 
 
 class Program(metaclass=ProgramMeta):
     def __init__(self):
         self._opcodes = self._opcode_destination()
-        self.cpu = make_cpu(self._cpu_spec)
+        self.cpu = make_cpu(self._cpu_name)
         self._cpu_namespace = {}
         for section_name in self.cpu["all"]:
             for name, item in self.cpu[section_name].items():
