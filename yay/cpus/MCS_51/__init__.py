@@ -16,6 +16,20 @@ class Macros:
         Label(name)
         return name
 
+    @macro
+    def wait_on(self, bit):
+        label = self.new_label("wait_on_{}".format(bit))
+        JNB(bit, label)
+
+    @block_macro
+    def infinitely(self):
+        loop = self.new_label("infinite_loop")
+        yield
+        if self.offsetof(loop) >= -126:
+            SJMP(loop)
+        else:
+            LJMP(loop)
+
 
 class Accumulator:
     def __add__(self, other):
