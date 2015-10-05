@@ -54,6 +54,7 @@ class Program(metaclass=ProgramMeta):
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
 
+        self._inject_macros(vars(self.cpu["macros_from"]["macros_from"]))
         self._inject_macros(vars(type(self)))
 
         self.labels = {}

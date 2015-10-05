@@ -122,6 +122,23 @@ def test_for_loop():
     assert Test().to_binary() == Expected().to_binary()
 
 
+def test_default_for_loop():
+    class Test(Program):
+        def main(self):
+            CLR()
+            with self.loop(R7, 5):
+                ADD(R7)
+
+    class Expected(Program):
+        def main(self):
+            CLR()
+            MOV(R7, 5)
+            Label("loop_head")
+            ADD(R7)
+            DJNZ(R7, "loop_head")
+
+    assert Test().to_binary() == Expected().to_binary()
+
 
 @mark.xfail(reason="Not sure if this should be implemented.")
 def test_opcodes_in_class_body():

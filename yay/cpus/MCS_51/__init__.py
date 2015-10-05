@@ -1,4 +1,14 @@
 from yay.helpers import InvalidRegisterError
+from yay.program import macro, block_macro
+
+
+class Macros:
+    @block_macro
+    def loop(self, register, n):
+        MOV(register, n)
+        Label("loop_head")
+        yield
+        DJNZ(register, "loop_head")
 
 
 class Accumulator:
