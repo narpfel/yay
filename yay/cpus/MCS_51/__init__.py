@@ -10,6 +10,12 @@ class Macros:
         yield
         DJNZ(register, "loop_head")
 
+    @macro
+    def new_label(self, prefix="label"):
+        name = self.new_label_name(prefix)
+        Label(name)
+        return name
+
 
 class Accumulator:
     def __add__(self, other):

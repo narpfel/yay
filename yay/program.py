@@ -1,5 +1,6 @@
 from contextlib import suppress, contextmanager
 from functools import partial
+from itertools import count
 from types import MethodType
 
 from yay.helpers import inject_names
@@ -116,3 +117,9 @@ class Program(metaclass=ProgramMeta):
 
     def offsetof(self, label):
         return self.position - self.labels[label]
+
+    def new_label_name(self, prefix):
+        for n in count():
+            name = "{}_{}".format(prefix, n)
+            if name not in self.labels:
+                return name
