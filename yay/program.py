@@ -113,3 +113,6 @@ class Program(metaclass=ProgramMeta):
 
     def get_position(self, mnemonic):
         return self._opcodes.index(mnemonic)
+
+    def offsetof(self, label):
+        return self.position - self.labels[label]
