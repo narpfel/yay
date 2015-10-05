@@ -170,6 +170,7 @@ def at(register):
 
 class Label:
     def __init__(self, name):
+        self.name = name
         self.program.add_label(name)
 
     @classmethod
