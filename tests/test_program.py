@@ -5,7 +5,7 @@ from textwrap import dedent
 
 from pytest import raises, mark
 
-from yay.program import Program as _Program, block_macro
+from yay.program import Program as _Program, block_macro, macro
 
 
 class Program(_Program, cpu="AT89S8253"):
@@ -136,6 +136,29 @@ def test_default_for_loop():
             Label("loop_head")
             ADD(R7)
             DJNZ(R7, "loop_head")
+
+    assert Test().to_binary() == Expected().to_binary()
+
+
+def test_inherited_macros():
+    class Base(Program):
+        @macro
+        def base_macro(self, direct):
+            ADD(direct)
+
+    class Test(Base):
+        @macro
+        def macro(self, direct):
+            ADD(direct)
+
+        def main(self):
+            self.base_macro(42)
+            self.macro(43)
+
+    class Expected(Program):
+        def main(self):
+            ADD(42)
+            ADD(43)
 
     assert Test().to_binary() == Expected().to_binary()
 

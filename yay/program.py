@@ -55,7 +55,8 @@ class Program(metaclass=ProgramMeta):
             self.main = inject_names(self._cpu_namespace)(self.main)
 
         self._inject_macros(vars(self.cpu["macros_from"]["macros_from"]))
-        self._inject_macros(vars(type(self)))
+        for cls in type(self).__mro__:
+            self._inject_macros(vars(cls))
 
         self.labels = {}
         self.position = 0
