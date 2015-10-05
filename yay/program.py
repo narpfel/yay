@@ -1,27 +1,35 @@
-from contextlib import suppress
+from contextlib import suppress, contextmanager
 from functools import partial
+from types import MethodType
 
 from yay.helpers import inject_names
 from yay.cpu import make_cpu
 
 
-def macro(f, *, register):
-    # Make sure each macro has its own `__globals__` dict so `Program` can
+def macro(f):
+    # Make sure each macro has its own `__globals__` dict so `add_names` can
     # `update` it without affecting other global namespaces.
     f = inject_names({})(f)
-    register.append(f)
+    def add_names(names):
+        f.__globals__.update(names)
+    f._add_names = add_names
+    f.is_macro = True
     return f
 
 
-class ProgramMeta(type):
-    @classmethod
-    def __prepare__(metacls, name, bases, **kwargs):
-        macros = []
-        return {
-            "_macros": macros,
-            "macro": partial(macro, register=macros)
-        }
+def block_macro(f):
+    f = macro(f)
+    context_f = contextmanager(f)
+    context_f._add_names = f._add_names
+    context_f.is_macro = f.is_macro
+    return context_f
 
+
+def is_macro(f):
+    return getattr(f, "is_macro", False)
+
+
+class ProgramMeta(type):
     def __new__(cls, name, bases, namespace, **kwargs):
         return type.__new__(cls, name, bases, namespace)
 
@@ -45,11 +53,17 @@ class Program(metaclass=ProgramMeta):
                     self._cpu_namespace[name] = item
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
-        for macro in self._macros:
-            macro.__globals__.update(self._cpu_namespace)
+
+        self._inject_macros(vars(type(self)))
 
         self.labels = {}
         self.position = 0
+
+    def _inject_macros(self, macros):
+        for name, value in macros.items():
+            if is_macro(value):
+                value._add_names(self._cpu_namespace)
+                setattr(self, name, MethodType(value, self))
 
     def append(self, mnemonic):
         self._opcodes.append(mnemonic)

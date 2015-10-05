@@ -5,7 +5,7 @@ from textwrap import dedent
 
 from pytest import raises, mark
 
-from yay.program import Program as _Program
+from yay.program import Program as _Program, block_macro
 
 
 class Program(_Program, cpu="AT89S8253"):
@@ -97,9 +97,8 @@ def test_mnemonics_in_method():
 
 def test_for_loop():
     class Test(Program):
-        @contextmanager
-        @macro
-        def loop(self, register, n):
+        @block_macro
+        def my_loop(self, register, n):
             """Actual loop implementation?"""
             MOV(register, n)
             Label("loop_head")
@@ -108,7 +107,7 @@ def test_for_loop():
 
         def main(self):
             CLR()
-            with self.loop(R7, 5):
+            with self.my_loop(R7, 5):
                 ADD(R7)
 
     # This shall expand to:

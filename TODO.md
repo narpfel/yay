@@ -57,8 +57,7 @@ SJMP("loop")
 
 Possible implementation:
 ```py
-@contextmanager
-@macro
+@block_macro
 def infinitely(self, jmp=None):
     if jmp is None:
         jmp = SJMP
