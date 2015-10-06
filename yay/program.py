@@ -31,14 +31,14 @@ def is_macro(f):
 
 
 class ProgramMeta(type):
-    def __new__(cls, name, bases, namespace, **kwargs):
-        return type.__new__(cls, name, bases, namespace)
+    def __new__(metacls, name, bases, namespace, **kwargs):
+        return type.__new__(metacls, name, bases, namespace)
 
-    def __init__(self, name, bases, namespace, **kwargs):
-        type.__init__(self, name, bases, namespace)
+    def __init__(cls, name, bases, namespace, **kwargs):
+        type.__init__(cls, name, bases, namespace)
         with suppress(KeyError):
-            self._cpu_name = kwargs["cpu"]
-        self._opcode_destination = kwargs.get("opcode_destination", list)
+            cls._cpu_name = kwargs["cpu"]
+        cls._opcode_destination = kwargs.get("opcode_destination", list)
 
 
 class Program(metaclass=ProgramMeta):
