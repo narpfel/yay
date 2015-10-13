@@ -1,12 +1,3 @@
-from pytest import importorskip
-
-importorskip("yay.macros")
-from yay.macros import xor, clear_port, set_port, lsl, lsr
-
-# TODO: quick and dirty
-from yay.registers import AT89S8253
-globals().update(AT89S8253.registers)
-
 from yay.program import Program as _Program
 
 
@@ -15,48 +6,44 @@ class Program(_Program, cpu="AT89S8253"):
 
 
 def test_xor():
-    left, right = A[2], A[4]
-
     class XorTest(Program):
         def main(self):
-            xor(left, right)
+            self.xor(ACC[2], ACC[4])
 
     class Expected(Program):
         def main(self):
-            LDB(left)
-            JNB(right, "dont_toggle")
+            LDB(ACC[2])
+            JNB(ACC[4], "dont_toggle")
             CPL(C)
-            LABEL("dont_toggle")
+            Label("dont_toggle")
 
     assert XorTest().to_binary() == Expected().to_binary()
 
 
 def test_clear_port():
     bit_mask = 0x3A
-    port = P1
 
     class ClearPortTest(Program):
         def main(self):
-            clear_port(port=port, bit_mask=bit_mask)
+            self.clear_port(port=P1, bit_mask=bit_mask)
 
     class Expected(Program):
         def main(self):
-            AND(port, bit_mask)
+            AND(P1, bit_mask)
 
     assert ClearPortTest().to_binary() == Expected().to_binary()
 
 
 def test_set_port():
     bit_mask = 0x3A
-    port = P1
 
     class SetPortTest(Program):
         def main(self):
-            set_port(port=port, bit_mask=bit_mask)
+            self.set_port(port=P1, bit_mask=bit_mask)
 
     class Expected(Program):
         def main(self):
-            OR(port, bit_mask)
+            OR(P1, bit_mask)
 
     assert SetPortTest().to_binary() == Expected().to_binary()
 
@@ -64,7 +51,7 @@ def test_set_port():
 def test_lsl():
     class LslTest(Program):
         def main(self):
-            lsl()
+            self.lsl()
 
     class Expected(Program):
         def main(self):
@@ -77,7 +64,7 @@ def test_lsl():
 def test_lsr():
     class LsrTest(Program):
         def main(self):
-            lsr()
+            self.lsr()
 
     class Expected(Program):
         def main(self):

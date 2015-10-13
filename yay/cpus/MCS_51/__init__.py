@@ -34,6 +34,32 @@ class Macros:
     def call(self, label):
         LCALL(label)
 
+    @macro
+    def clear_port(self, port, bit_mask):
+        AND(port, bit_mask)
+
+    @macro
+    def set_port(self, port, bit_mask):
+        OR(port, bit_mask)
+
+    @macro
+    def xor(self, left, right):
+        LDB(left)
+        label = self.new_label_name("skip_toggle")
+        JNB(right, label)
+        CPL(C)
+        Label(label)
+
+    @macro
+    def lsl(self):
+        CLR(C)
+        RLC()
+
+    @macro
+    def lsr(self):
+        CLR(C)
+        RRC()
+
 
 class Accumulator:
     def __add__(self, other):
