@@ -185,10 +185,11 @@ def test_compare_with_sdcc(tmpdir):
             imm = -42
             Rn = R3
             Ri = R0
-            rel = 120
-            addr11 = 1234
+            rel = "rel"
+            addr11 = "rel"
             addr16 = 12345
             bit = Bit(42)
+
             # Arithmetic operations
             ADD(dir)
             ADD(at(Ri))
@@ -282,11 +283,14 @@ def test_compare_with_sdcc(tmpdir):
             OR(~bit)
             LDB(bit)
             STB(bit)
-            # JC(rel)
-            # JNC(rel)
-            # JB(bit, rel)
-            # JNB(bit, rel)
-            # JBC(bit, rel)
+
+            Label(rel)
+
+            JC(rel)
+            JNC(rel)
+            JB(bit, rel)
+            JNB(bit, rel)
+            JBC(bit, rel)
             # Control flow
             # TODO: CALL
             ACALL(addr11)
@@ -296,16 +300,16 @@ def test_compare_with_sdcc(tmpdir):
             # TODO: JMP
             AJMP(addr11)
             LJMP(addr16)
-            # SJMP(rel)
+            SJMP(rel)
             JMP(at(A + DPTR))
-            # JZ(rel)
-            # JNZ(rel)
-            # CJNE(A, dir, rel)
-            # CJNE(A, imm, rel)
-            # CJNE(Rn, imm, rel)
-            # CJNE(at(Ri), imm, rel)
-            # DJNZ(Rn, rel)
-            # DJNZ(dir, rel)
+            JZ(rel)
+            JNZ(rel)
+            CJNE(A, dir, rel)
+            CJNE(A, imm, rel)
+            CJNE(Rn, imm, rel)
+            CJNE(at(Ri), imm, rel)
+            DJNZ(Rn, rel)
+            DJNZ(dir, rel)
 
             NOP()
 
@@ -405,11 +409,14 @@ def test_compare_with_sdcc(tmpdir):
         ORL C, /bit
         MOV C, bit
         MOV bit, C
-        ;JC rel
-        ;JNC rel
-        ;JB bit, rel
-        ;JNB bit, rel
-        ;JBC bit, rel
+
+rel:
+
+        JC rel
+        JNC rel
+        JB bit, rel
+        JNB bit, rel
+        JBC bit, rel
         ; Control flow operations
         ; TODO: CALL
         ACALL addr11
@@ -419,16 +426,16 @@ def test_compare_with_sdcc(tmpdir):
         ; TODO: JMP
         AJMP addr11
         LJMP addr16
-        ;SJMP rel
+        SJMP rel
         JMP @A+DPTR
-        ;JZ rel
-        ;JNZ rel
-        ;CJNE A, dir, rel
-        ;CJNE A, #imm, rel
-        ;CJNE Rn, #imm, rel
-        ;CJNE @Ri, #imm, rel
-        ;DJNZ Rn, rel
-        ;DJNZ dir, rel
+        JZ rel
+        JNZ rel
+        CJNE A, dir, rel
+        CJNE A, #imm, rel
+        CJNE Rn, #imm, rel
+        CJNE @Ri, #imm, rel
+        DJNZ Rn, rel
+        DJNZ dir, rel
 
         NOP
     """
@@ -436,8 +443,7 @@ def test_compare_with_sdcc(tmpdir):
         .replace("imm", "-42")
         .replace("Rn", "R3")
         .replace("Ri", "R0")
-        .replace("rel", "120")
-        .replace("addr11", "1234")
+        .replace("addr11", "rel")
         .replace("addr16", "12345")
         .replace("bit", "42")
     )
