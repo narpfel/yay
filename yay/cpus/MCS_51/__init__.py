@@ -30,6 +30,10 @@ class Macros:
         else:
             LJMP(loop)
 
+    @macro
+    def call(self, label):
+        LCALL(label)
+
 
 class Accumulator:
     def __add__(self, other):
