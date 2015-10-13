@@ -142,8 +142,13 @@ class Program(metaclass=ProgramMeta):
             sub.emit_body(self)
         return b"".join(opcode.opcode for opcode in self._opcodes)
 
-    def get_position(self, mnemonic):
-        return self._opcodes.index(mnemonic)
+    def get_position(self, searched):
+        position = 0
+        for mnemonic in self._opcodes:
+            if mnemonic is searched:
+                return position
+            position += mnemonic.size
+        raise ValueError("{} is not in this program.".format(searched))
 
     def offsetof(self, label):
         return self.position - self.labels[label]
