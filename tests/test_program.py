@@ -5,21 +5,11 @@ from textwrap import dedent
 
 from pytest import raises, mark
 
-from yay.program import Program as _Program, block_macro, macro
+from yay.program import Program as _Program, block_macro, macro, sub
 
 
 class Program(_Program, cpu="AT89S8253"):
     pass
-
-
-try:
-    class Test(Program):
-        macro
-        sub
-except NameError:
-    should_skip = True
-else:
-    should_skip = False
 
 
 @lru_cache(maxsize=1)
@@ -34,72 +24,10 @@ def has_sdcc():
         return True
 
 
-@mark.skipif(should_skip, reason="Macros and subs not implemented.")
-def test_mnemonics_in_method():
-    class Test(Program):
-        @macro
-        def add_and(self, operand):
-            """
-            ``@macro``s should just expand to their assembled opcodes where
-            they are called. They should provide arguments and lexical scoping,
-            especially for labels. This is important! It must never be possible
-            to jump from `main` to a label defined in in a macro inserted in
-            `main`.
-            """
-            ADD(operand)
-            AND(operand)
-
-        @sub
-        def adda(self, operand):
-            """
-            ``@sub``s shall expand to `CALL; {sub}; RET` except they
-            end in ``tail_call(sub)`` (or are decorated with ``@tail_call``).
-            (This is yet to be decided, preference in ``tail_call(other_sub)``.)
-            Then they shall `JMP` to the tail called sub.
-
-            TODO: Calling conventions: what does `operand` mean‽ How does the
-            required information get from the caller to the calee?
-            """
-            ADDA(operand)
-
-        def main(self):
-            CLR(A)
-            ADD(R3)
-            ADD(42)
-            add_and(12)
-            CLR(A)
-            add_and(R2)
-            CLR(A)
-            adda(R1)
-            # This shall expand to:
-            #
-            # LABEL("adda")
-            # ADDA({operand})
-            # RET
-            # LABEL("main") # This is where the program starts.
-            # CLR(A)
-            # ADD(R3)
-            # ADD(42)
-            # ADD(12)
-            # AND(12)
-            # CLR(A)
-            # ADD(R2)
-            # AND(R2)
-            # CLR(A)
-            # CALL("adda")
-
-    test = Test()
-    assert False # Add correct binary below.
-    # `Test.to_binary` shall invoke `main` and spit out the complete program
-    # in binary, (in theory) ready to be programmed.
-    assert test.to_binary() == bytes([0b00101011, 0b00100101, 42])
-
-
 def test_for_loop():
     class Test(Program):
         @block_macro
         def my_loop(self, register, n):
-            """Actual loop implementation?"""
             MOV(register, n)
             Label("loop_head")
             yield
@@ -161,6 +89,42 @@ def test_inherited_macros():
             ADD(43)
 
     assert Test().to_binary() == Expected().to_binary()
+
+
+def test_sub():
+    class Test(Program):
+        @sub
+        def foo(self):
+            INC()
+            RET()
+
+        def main(self):
+            NOP()
+            self.foo()
+            NOP()
+
+    class Expected(Program):
+        def main(self):
+            NOP()
+            LCALL("foo")
+            NOP()
+            Label("foo")
+            INC()
+            RET()
+
+    assert Test().to_binary() == Expected().to_binary()
+
+
+def test_unused_sub_does_not_emit_body():
+    class Test(Program):
+        @sub
+        def unused(self):
+            INC()
+
+        def main(self):
+            pass
+
+    assert Test().to_binary() == b""
 
 
 @mark.xfail(reason="Not sure if this should be implemented.")

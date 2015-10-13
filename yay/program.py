@@ -25,8 +25,33 @@ def block_macro(f):
     return context_f
 
 
+class sub:
+    def __init__(self, f):
+        self.f = macro(f)
+        self.is_macro = True
+        self.is_sub = True
+        self.was_called = False
+
+    def _add_names(self, names):
+        self.f._add_names(names)
+        self.emit_body = inject_names(names)(self.emit_body)
+
+    def __call__(self, program):
+        self.was_called = True
+        program.call(self.f.__name__)
+
+    def emit_body(self, program):
+        if self.was_called:
+            Label(self.f.__name__)
+            self.f(program)
+
+
 def is_macro(f):
     return getattr(f, "is_macro", False)
+
+
+def is_sub(candidate):
+    return getattr(candidate, "is_sub", False)
 
 
 class ProgramMeta(type):
@@ -54,9 +79,13 @@ class Program(metaclass=ProgramMeta):
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
 
-        self._inject_macros(vars(self.cpu["macros_from"]["macros_from"]))
-        for cls in type(self).__mro__:
+        self.subs = []
+
+        macro_sources = [self.cpu["macros_from"]["macros_from"]]
+        macro_sources.extend(type(self).__mro__)
+        for cls in macro_sources:
             self._inject_macros(vars(cls))
+            self.subs.extend(filter(is_sub, vars(cls).values()))
 
         self.labels = {}
         self.position = 0
@@ -109,6 +138,8 @@ class Program(metaclass=ProgramMeta):
 
     def to_binary(self):
         self.main()
+        for sub in self.subs:
+            sub.emit_body(self)
         return b"".join(opcode.opcode for opcode in self._opcodes)
 
     def get_position(self, mnemonic):
