@@ -26,6 +26,8 @@ def make_mnemonics(config):
 
 
 class Mnemonic:
+    _SHORT_BIT_FORMAT = re.compile(r"(\w)(\d+)")
+
     program = None
     signatures = None
 
@@ -162,7 +164,7 @@ class Mnemonic:
 
     def try_match_bit(self, bit_format):
         try:
-            match = re.match(r"(\w)(\d+)", bit_format)
+            match = self._SHORT_BIT_FORMAT.match(bit_format)
         except TypeError:
             return int(bit_format)
         short = match.group(1)
