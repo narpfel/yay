@@ -1,5 +1,4 @@
 from contextlib import suppress, contextmanager
-from functools import partial
 from itertools import count
 from types import MethodType
 
