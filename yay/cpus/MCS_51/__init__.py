@@ -144,9 +144,9 @@ class Byte:
 
 class SFR(Byte):
     def __init__(self, name, byte_addr):
-        if byte_addr not in range(128, 257):
+        if byte_addr not in range(128, 256):
             raise ValueError(
-                "`byte_addr` must be in range(128, 257), not {}"
+                "`byte_addr` must be in range(128, 256), not {}"
                 .format(byte_addr)
             )
         super().__init__(byte_addr)
