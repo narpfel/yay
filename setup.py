@@ -15,6 +15,11 @@ setup(
     package_data={
         "yay": ["cpu_configurations/*.yml"],
     },
+    entry_points={
+        "console_scripts": [
+            "yay=yay.__main__:main",
+        ]
+    },
     install_requires=requirements,
     license="GPLv3",
     zip_safe=True,
