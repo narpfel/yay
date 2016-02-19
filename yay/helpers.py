@@ -49,7 +49,7 @@ def recursive_merge(base, update):
 
     merged = dict(base)
     merged.update(update)
-    for key in set(base) & set(update):
+    for key in base.keys() & update.keys():
         merged[key] = recursive_merge(base[key], update[key])
     return merged
 
