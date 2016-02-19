@@ -1,18 +1,14 @@
 import argparse
+from importlib.machinery import SourceFileLoader
 import sys
 
 
-def run_yay_file(yay_filename):
-    with open(yay_filename) as yay_file:
-        yay_source = yay_file.read()
-    code = compile(yay_source, yay_filename, "exec")
-    namespace = {}
-    exec(code, namespace)
-    return namespace
+def import_yay_file(yay_filename):
+    return SourceFileLoader("main", yay_filename).load_module()
 
 
 def get_main_class(namespace, class_name):
-    return namespace[class_name]
+    return getattr(namespace, class_name)
 
 
 def main(argv=None):
@@ -45,7 +41,7 @@ def main(argv=None):
 
     args = parser.parse_args(argv)
 
-    main_class = get_main_class(run_yay_file(args.yay_file), args.main_class)
+    main_class = get_main_class(import_yay_file(args.yay_file), args.main_class)
     program = main_class()
     binary = program.to_binary()
 
