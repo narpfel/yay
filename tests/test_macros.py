@@ -12,9 +12,9 @@ def test_xor():
 
     class Expected(Program):
         def main(self):
-            LDB(ACC[2])
-            JNB(ACC[4], "dont_toggle")
-            CPL(C)
+            ldb(ACC[2])
+            jnb(ACC[4], "dont_toggle")
+            cpl(C)
             Label("dont_toggle")
 
     assert XorTest().to_binary() == Expected().to_binary()
@@ -29,7 +29,7 @@ def test_clear_port():
 
     class Expected(Program):
         def main(self):
-            AND(P1, bit_mask)
+            andl(P1, bit_mask)
 
     assert ClearPortTest().to_binary() == Expected().to_binary()
 
@@ -43,7 +43,7 @@ def test_set_port():
 
     class Expected(Program):
         def main(self):
-            OR(P1, bit_mask)
+            orl(P1, bit_mask)
 
     assert SetPortTest().to_binary() == Expected().to_binary()
 
@@ -55,8 +55,8 @@ def test_lsl():
 
     class Expected(Program):
         def main(self):
-            CLR(C)
-            RLC()
+            clr(C)
+            rlc()
 
     assert LslTest().to_binary() == Expected().to_binary()
 
@@ -68,7 +68,7 @@ def test_lsr():
 
     class Expected(Program):
         def main(self):
-            CLR(C)
-            RRC()
+            clr(C)
+            rrc()
 
     assert LsrTest().to_binary() == Expected().to_binary()

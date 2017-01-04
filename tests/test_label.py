@@ -8,7 +8,7 @@ def TestProgram():
     class TestProgram(Program, cpu="MCS_51"):
         def main(self):
             Label("before_nop")
-            NOP()
+            nop()
             Label("after_nop")
 
     return TestProgram

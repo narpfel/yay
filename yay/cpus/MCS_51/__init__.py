@@ -5,10 +5,10 @@ from yay.program import macro, block_macro
 class Macros:
     @block_macro
     def loop(self, register, n):
-        MOV(register, n)
+        mov(register, n)
         Label("loop_head")
         yield
-        DJNZ(register, "loop_head")
+        djnz(register, "loop_head")
 
     @macro
     def new_label(self, prefix="label"):
@@ -19,46 +19,46 @@ class Macros:
     @macro
     def wait_on(self, bit):
         label = self.new_label("wait_on_{}".format(bit))
-        JNB(bit, label)
+        jnb(bit, label)
 
     @block_macro
     def infinitely(self):
         loop = self.new_label("infinite_loop")
         yield
         if self.offsetof(loop) >= -126:
-            SJMP(loop)
+            sjmp(loop)
         else:
-            LJMP(loop)
+            ljmp(loop)
 
     @macro
     def call(self, label):
-        LCALL(label)
+        lcall(label)
 
     @macro
     def clear_port(self, port, bit_mask):
-        AND(port, bit_mask)
+        andl(port, bit_mask)
 
     @macro
     def set_port(self, port, bit_mask):
-        OR(port, bit_mask)
+        orl(port, bit_mask)
 
     @macro
     def xor(self, left, right):
-        LDB(left)
+        ldb(left)
         label = self.new_label_name("skip_toggle")
-        JNB(right, label)
-        CPL(C)
+        jnb(right, label)
+        cpl(C)
         Label(label)
 
     @macro
     def lsl(self):
-        CLR(C)
-        RLC()
+        clr(C)
+        rlc()
 
     @macro
     def lsr(self):
-        CLR(C)
-        RRC()
+        clr(C)
+        rrc()
 
 
 class Accumulator:

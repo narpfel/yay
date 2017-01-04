@@ -28,24 +28,24 @@ def test_for_loop():
     class Test(Program):
         @block_macro
         def my_loop(self, register, n):
-            MOV(register, n)
+            mov(register, n)
             Label("loop_head")
             yield
-            DJNZ(register, "loop_head")
+            djnz(register, "loop_head")
 
         def main(self):
-            CLR()
+            clr()
             with self.my_loop(R7, 5):
-                ADD(R7)
+                add(R7)
 
     # This shall expand to:
     class Expected(Program):
         def main(self):
-            CLR()
-            MOV(R7, 5)
+            clr()
+            mov(R7, 5)
             Label("loop_head")
-            ADD(R7)
-            DJNZ(R7, "loop_head")
+            add(R7)
+            djnz(R7, "loop_head")
 
     assert Test().to_binary() == Expected().to_binary()
 
@@ -53,17 +53,17 @@ def test_for_loop():
 def test_default_for_loop():
     class Test(Program):
         def main(self):
-            CLR()
+            clr()
             with self.loop(R7, 5):
-                ADD(R7)
+                add(R7)
 
     class Expected(Program):
         def main(self):
-            CLR()
-            MOV(R7, 5)
+            clr()
+            mov(R7, 5)
             Label("loop_head")
-            ADD(R7)
-            DJNZ(R7, "loop_head")
+            add(R7)
+            djnz(R7, "loop_head")
 
     assert Test().to_binary() == Expected().to_binary()
 
@@ -72,12 +72,12 @@ def test_inherited_macros():
     class Base(Program):
         @macro
         def base_macro(self, direct):
-            ADD(direct)
+            add(direct)
 
     class Test(Base):
         @macro
         def macro(self, direct):
-            ADD(direct)
+            add(direct)
 
         def main(self):
             self.base_macro(42)
@@ -85,8 +85,8 @@ def test_inherited_macros():
 
     class Expected(Program):
         def main(self):
-            ADD(42)
-            ADD(43)
+            add(42)
+            add(43)
 
     assert Test().to_binary() == Expected().to_binary()
 
@@ -95,22 +95,22 @@ def test_sub():
     class Test(Program):
         @sub
         def foo(self):
-            INC()
-            RET()
+            inc()
+            ret()
 
         def main(self):
-            NOP()
+            nop()
             self.foo()
-            NOP()
+            nop()
 
     class Expected(Program):
         def main(self):
-            NOP()
-            LCALL("foo")
-            NOP()
+            nop()
+            lcall("foo")
+            nop()
             Label("foo")
-            INC()
-            RET()
+            inc()
+            ret()
 
     assert Test().to_binary() == Expected().to_binary()
 
@@ -119,7 +119,7 @@ def test_unused_sub_does_not_emit_body():
     class Test(Program):
         @sub
         def unused(self):
-            INC()
+            inc()
 
         def main(self):
             pass
@@ -130,12 +130,12 @@ def test_unused_sub_does_not_emit_body():
 @mark.xfail(reason="Not sure if this should be implemented.")
 def test_opcodes_in_class_body():
     class InBody(Program):
-        ADD(R2)
+        add(R2)
 
 
     class InMain(Program):
         def main(self):
-            ADD(R2)
+            add(R2)
 
     assert InBody().to_binary() == InMain().to_binary()
 
@@ -143,15 +143,15 @@ def test_opcodes_in_class_body():
 def test_opcodes_in_class_body_fail():
     with raises(NameError):
         class Test(Program):
-            ADD(R3)
+            add(R3)
 
 
 def test_self():
     class Test(Program):
         foo = 42
         def main(self):
-            ADD(R3)
-            ADD(42)
+            add(R3)
+            add(42)
             with raises(NameError):
                 foo
             self.foo
@@ -171,7 +171,7 @@ def test_missing_self_fails():
 def test_label_used_before_declared():
     class Test(Program):
         def main(self):
-            SJMP("label")
+            sjmp("label")
             Label("label")
 
     assert Test().to_binary() == bytes([0b10000000, 0b00000000])
@@ -191,127 +191,127 @@ def test_compare_with_sdcc(tmpdir):
             bit = Bit(42)
 
             # Arithmetic operations
-            ADD(dir)
-            ADD(at(Ri))
-            ADD(Rn)
-            ADD(imm)
-            ADDC(dir)
-            ADDC(at(Ri))
-            ADDC(Rn)
-            ADDC(imm)
-            SUBB(dir)
-            SUBB(at(Ri))
-            SUBB(Rn)
-            SUBB(imm)
-            INC()
-            INC(dir)
-            INC(at(Ri))
-            INC(Rn)
-            INC(DPTR)
-            DEC()
-            DEC(dir)
-            DEC(at(Ri))
-            DEC(Rn)
-            MUL()
-            DIV()
-            DA()
+            add(dir)
+            add(at(Ri))
+            add(Rn)
+            add(imm)
+            addc(dir)
+            addc(at(Ri))
+            addc(Rn)
+            addc(imm)
+            subb(dir)
+            subb(at(Ri))
+            subb(Rn)
+            subb(imm)
+            inc()
+            inc(dir)
+            inc(at(Ri))
+            inc(Rn)
+            inc(DPTR)
+            dec()
+            dec(dir)
+            dec(at(Ri))
+            dec(Rn)
+            mul()
+            div()
+            da()
             # Logical operations
-            AND(dir)
-            AND(at(Ri))
-            AND(Rn)
-            AND(imm)
-            AND(dir, A)
-            AND(dir, imm)
-            OR(dir)
-            OR(at(Ri))
-            OR(Rn)
-            OR(imm)
-            OR(dir, A)
-            OR(dir, imm)
-            XOR(dir)
-            XOR(at(Ri))
-            XOR(Rn)
-            XOR(imm)
-            XOR(dir, A)
-            XOR(dir, imm)
-            CLR()
-            CPL()
-            RL()
-            RLC()
-            RR()
-            RRC()
-            SWAP()
+            andl(dir)
+            andl(at(Ri))
+            andl(Rn)
+            andl(imm)
+            andl(dir, A)
+            andl(dir, imm)
+            orl(dir)
+            orl(at(Ri))
+            orl(Rn)
+            orl(imm)
+            orl(dir, A)
+            orl(dir, imm)
+            xor(dir)
+            xor(at(Ri))
+            xor(Rn)
+            xor(imm)
+            xor(dir, A)
+            xor(dir, imm)
+            clr()
+            cpl()
+            rl()
+            rlc()
+            rr()
+            rrc()
+            swap()
             # Data transfer operations
-            LDR(Rn)
-            LDD(dir)
-            LDR(at(Ri))
-            LDI(imm)
-            STR(Rn)
-            MOV(Rn, dir)
-            MOV(Rn, imm)
-            STD(dir)
-            MOV(dir, Rn)
-            MOV(dir, dir)
-            MOV(dir, at(Ri))
-            MOV(dir, imm)
-            STR(at(Ri))
-            MOV(at(Ri), dir)
-            MOV(at(Ri), imm)
-            MOV(DPTR, addr16)
-            LPM(at(A + DPTR))
-            LPM(at(A + PC))
-            LDX(at(Ri))
-            LDX(at(DPTR))
-            STX(at(Ri))
-            STX(at(DPTR))
-            PUSH(dir)
-            POP(dir)
-            XCH(A, dir)
-            XCH(A, at(Ri))
-            XCH(A, Rn)
-            XCHD(A, at(Ri))
+            ldr(Rn)
+            ldd(dir)
+            ldr(at(Ri))
+            ldi(imm)
+            str(Rn)
+            mov(Rn, dir)
+            mov(Rn, imm)
+            std(dir)
+            mov(dir, Rn)
+            mov(dir, dir)
+            mov(dir, at(Ri))
+            mov(dir, imm)
+            str(at(Ri))
+            mov(at(Ri), dir)
+            mov(at(Ri), imm)
+            mov(DPTR, addr16)
+            lpm(at(A + DPTR))
+            lpm(at(A + PC))
+            ldx(at(Ri))
+            ldx(at(DPTR))
+            stx(at(Ri))
+            stx(at(DPTR))
+            push(dir)
+            pop(dir)
+            xch(A, dir)
+            xch(A, at(Ri))
+            xch(A, Rn)
+            xchd(A, at(Ri))
             # Boolean operations
-            CLR(C)
-            CLR(bit)
-            SET(C)
-            SET(bit)
-            CPL(C)
-            CPL(bit)
-            AND(bit)
-            AND(~bit)
-            OR(bit)
-            OR(~bit)
-            LDB(bit)
-            STB(bit)
+            clr(C)
+            clr(bit)
+            set(C)
+            set(bit)
+            cpl(C)
+            cpl(bit)
+            andl(bit)
+            andl(~bit)
+            orl(bit)
+            orl(~bit)
+            ldb(bit)
+            stb(bit)
 
             Label(rel)
 
-            JC(rel)
-            JNC(rel)
-            JB(bit, rel)
-            JNB(bit, rel)
-            JBC(bit, rel)
+            jc(rel)
+            jnc(rel)
+            jb(bit, rel)
+            jnb(bit, rel)
+            jbc(bit, rel)
             # Control flow
             # TODO: CALL
-            ACALL(addr11)
-            LCALL(addr16)
-            RET()
-            RETI()
+            acall(addr11)
+            lcall(addr16)
+            ret()
+            reti()
             # TODO: JMP
-            AJMP(addr11)
-            LJMP(addr16)
-            SJMP(rel)
-            JMP(at(A + DPTR))
-            JZ(rel)
-            JNZ(rel)
-            CJNE(A, dir, rel)
-            CJNE(A, imm, rel)
-            CJNE(Rn, imm, rel)
-            CJNE(at(Ri), imm, rel)
-            DJNZ(Rn, rel)
-            DJNZ(dir, rel)
+            ajmp(addr11)
+            ljmp(addr16)
+            sjmp(rel)
+            jmp(at(A + DPTR))
+            jz(rel)
+            jnz(rel)
+            cjne(A, dir, rel)
+            cjne(A, imm, rel)
+            cjne(Rn, imm, rel)
+            cjne(at(Ri), imm, rel)
+            djnz(Rn, rel)
+            djnz(dir, rel)
 
-            NOP()
+            nop()
 
     yay_result = Test().to_binary()
 
@@ -470,7 +470,7 @@ rel:
 def test_program_relocation():
     class Test(Program):
         def main(self):
-            INC()
+            inc()
 
     test = Test()
     test.relocate(0x8000)

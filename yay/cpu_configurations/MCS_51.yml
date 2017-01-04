@@ -67,12 +67,12 @@ signature_contents:
         short: null
     # And so on...
 mnemonics:
-    ACALL:
+    acall:
         - signature: ["addr11"]
           opcode:
               - ["a10", "a9", "a8", 1, 0, 0, 0, 1]
               - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
-    ADD:
+    add:
         - signature: ["direct"]
           opcode:
               - [0b0010_0101]
@@ -87,7 +87,7 @@ mnemonics:
           opcode:
             - [0b0010_0100]
             - ["immediate"]
-    ADDC:
+    addc:
         - signature: ["direct"]
           opcode:
               - [0b0011_0101]
@@ -102,13 +102,13 @@ mnemonics:
           opcode:
             - [0b0011_0100]
             - ["immediate"]
-    AJMP:
+    ajmp:
         - signature: ["addr11"]
           opcode:
               - ["a10", "a9", "a8", 0, 0, 0, 0, 1]
               - ["a7", "a6", "a5", "a4", "a3", "a2", "a1", "a0"]
               # alternatively: `- ["low(addr11)"]`‽
-    AND:
+    andl:
         - signature: ["direct"]
           opcode:
               - [0b0101_0101]
@@ -140,7 +140,7 @@ mnemonics:
           opcode:
               - [0b1011_0000]
               - ["not_bit"]
-    CJNE:
+    cjne:
         - signature: ["accu", "direct", "relative"]
           opcode:
               - [0b1011_0101]
@@ -161,7 +161,7 @@ mnemonics:
               - [1, 0, 1, 1, 0, 1, 1, "i0"]
               - ["immediate"]
               - ["relative"]
-    CLR:
+    clr:
         - signature: []
           opcode:
               - [0b1110_0100]
@@ -172,7 +172,7 @@ mnemonics:
           opcode:
               - [0b1100_0010]
               - ["bit"]
-    CPL:
+    cpl:
         - signature: []
           opcode:
               - [0b1111_0100]
@@ -183,11 +183,11 @@ mnemonics:
           opcode:
               - [0b1011_0010]
               - ["bit"]
-    DA:
+    da:
         - signature: []
           opcode:
               - [0b1101_0100]
-    DEC:
+    dec:
         - signature: []
           opcode:
               - [0b0001_0100]
@@ -201,11 +201,11 @@ mnemonics:
         - signature: ["indirect"]
           opcode:
               - [0, 0, 0, 1, 0, 1, 1, "i0"]
-    DIV:
+    div:
         - signature: []
           opcode:
               - [0b1000_0100]
-    DJNZ:
+    djnz:
         - signature: ["register", "relative"]
           opcode:
               - [1, 1, 0, 1, 1, "r2", "r1", "r0"]
@@ -215,7 +215,7 @@ mnemonics:
               - [0b1101_0101]
               - ["direct"]
               - ["relative"]
-    INC:
+    inc:
         - signature: []
           opcode:
               - [0b0000_0100]
@@ -232,86 +232,86 @@ mnemonics:
         - signature: ["dptr"]
           opcode:
               - [0b1010_0011]
-    JB:
+    jb:
         - signature: ["bit", "relative"]
           opcode:
               - [0b0010_0000]
               - ["bit"]
               - ["relative"]
-    JBC:
+    jbc:
         - signature: ["bit", "relative"]
           opcode:
               - [0b0001_0000]
               - ["bit"]
               - ["relative"]
-    JC:
+    jc:
         - signature: ["relative"]
           opcode:
               - [0b0100_0000]
               - ["relative"]
     # TODO: JMP(at(A + DPTR))
-    JMP:
+    jmp:
         - signature: ["dptr_offset"]
           opcode:
               - [0b0111_0011]
-    JNB:
+    jnb:
         - signature: ["bit", "relative"]
           opcode:
               - [0b0011_0000]
               - ["bit"]
               - ["relative"]
-    JNC:
+    jnc:
         - signature: ["relative"]
           opcode:
               - [0b0101_0000]
               - ["relative"]
-    JNZ:
+    jnz:
         - signature: ["relative"]
           opcode:
               - [0b0111_0000]
               - ["relative"]
-    JZ:
+    jz:
         - signature: ["relative"]
           opcode:
               - [0b0110_0000]
               - ["relative"]
-    LCALL:
+    lcall:
         - signature: ["addr16"]
           opcode:
               - [0b0001_0010]
               - ["l15", "l14", "l13", "l12", "l11", "l10", "l9", "l8"]
               - ["l7", "l6", "l5", "l4", "l3", "l2", "l1", "l0"]
-    LJMP:
+    ljmp:
         - signature: ["addr16"]
           opcode:
               - [0b0000_0010]
               - ["l15", "l14", "l13", "l12", "l11", "l10", "l9", "l8"]
               - ["l7", "l6", "l5", "l4", "l3", "l2", "l1", "l0"]
-    LDR:
+    ldr:
         - signature: ["register"]
           opcode:
               - [1, 1, 1, 0, 1, "r2", "r1", "r0"]
         - signature: ["indirect"]
           opcode:
               - [1, 1, 1, 0, 0, 1, 1, "i0"]
-    LDD:
+    ldd:
         - signature: ["direct"]
           opcode:
               - [0b1110_0101]
               - ["direct"]
-    LDI:
+    ldi:
         - signature: ["immediate"]
           opcode:
               - [0b0111_0100]
               - ["immediate"]
-    STR:
+    str:
         - signature: ["register"]
           opcode:
               - [1, 1, 1, 1, 1, "r2", "r1", "r0"]
         - signature: ["indirect"]
           opcode:
               - [1, 1, 1, 1, 0, 1, 1, "i0"]
-    MOV:
+    mov:
         - signature: ["register", "direct"]
           opcode:
               - [1, 0, 1, 0, 1, "r2", "r1", "r0"]
@@ -353,51 +353,51 @@ mnemonics:
               - [0b1001_0000]
               - ["s15", "s14", "s13", "s12", "s11", "s10", "s9", "s8"]
               - ["s7", "s6", "s5", "s4", "s3", "s2", "s1", "s0"]
-    STD:
+    std:
         - signature: ["direct"]
           opcode:
               - [0b1111_0101]
               - ["direct"]
-    LDB:
+    ldb:
         - signature: ["bit"]
           opcode:
               - [0b1010_0010]
               - ["bit"]
-    STB:
+    stb:
         - signature: ["bit"]
           opcode:
               - [0b1001_0010]
               - ["bit"]
-    LPM:
+    lpm:
         - signature: ["dptr_offset"]
           opcode:
               - [0b1001_0011]
         - signature: ["pc_offset"]
           opcode:
               - [0b1000_0011]
-    LDX:
+    ldx:
         - signature: ["indirect"]
           opcode:
               - [1, 1, 1, 0, 0, 0, 1, "i0"]
         - signature: ["indirect_dptr"]
           opcode:
               - [0b1110_0000]
-    STX:
+    stx:
         - signature: ["indirect"]
           opcode:
               - [1, 1, 1, 1, 0, 0, 1, "i0"]
         - signature: ["indirect_dptr"]
           opcode:
               - [0b1111_0000]
-    MUL:
+    mul:
         - signature: []
           opcode:
               - [0b1010_0100]
-    NOP:
+    nop:
         - signature: []
           opcode:
               - [0b0000_0000]
-    OR:
+    orl:
         - signature: ["register"]
           opcode:
               - [0, 1, 0, 0, 1, "r2", "r1", "r0"]
@@ -429,41 +429,41 @@ mnemonics:
           opcode:
               - [0b_0100_0100]
               - ["immediate"]
-    POP:
+    pop:
         - signature: ["direct"]
           opcode:
               - [0b1101_0000]
               - ["direct"]
-    PUSH:
+    push:
         - signature: ["direct"]
           opcode:
               - [0b1100_0000]
               - ["direct"]
-    RET:
+    ret:
         - signature: []
           opcode:
               - [0b0010_0010]
-    RETI:
+    reti:
         - signature: []
           opcode:
               - [0b0011_0010]
-    RL:
+    rl:
         - signature: []
           opcode:
               - [0b0010_0011]
-    RLC:
+    rlc:
         - signature: []
           opcode:
               - [0b0011_0011]
-    RR:
+    rr:
         - signature: []
           opcode:
               - [0b0000_0011]
-    RRC:
+    rrc:
         - signature: []
           opcode:
               - [0b0001_0011]
-    SET:
+    set:
         - signature: ["carry"]
           opcode:
               - [0b1101_0011]
@@ -471,12 +471,12 @@ mnemonics:
           opcode:
               - [0b1101_0010]
               - ["bit"]
-    SJMP:
+    sjmp:
         - signature: ["relative"]
           opcode:
               - [0b1000_0000]
               - ["relative"]
-    SUBB:
+    subb:
         - signature: ["register"]
           opcode:
               - [1, 0, 0, 1, 1, "r2", "r1", "r0"]
@@ -491,11 +491,11 @@ mnemonics:
           opcode:
               - [0b1001_0100]
               - ["immediate"]
-    SWAP:
+    swap:
         - signature: []
           opcode:
               - [0b1100_0100]
-    XCH:
+    xch:
         - signature: ["accu", "register"]
           opcode:
               - [1, 1, 0, 0, 1, "r2", "r1", "r0"]
@@ -506,11 +506,11 @@ mnemonics:
         - signature: ["accu", "indirect"]
           opcode:
               - [1, 1, 0, 0, 0, 1, 1, "i0"]
-    XCHD:
+    xchd:
         - signature: ["accu", "indirect"]
           opcode:
               - [1, 1, 0, 1, 0, 1, 1, "i0"]
-    XOR:
+    xor:
         - signature: ["register"]
           opcode:
               - [0, 1, 1, 0, 1, "r2", "r1", "r0"]
