@@ -89,6 +89,7 @@ class Program(metaclass=ProgramMeta):
 
         self.labels = {}
         self.position = 0
+        self.offset = 0
 
     def _inject_macros(self, macros):
         for name, value in macros.items():
@@ -140,10 +141,10 @@ class Program(metaclass=ProgramMeta):
         self.main()
         for sub in self.subs:
             sub.emit_body(self)
-        return b"".join(opcode.opcode for opcode in self._opcodes)
+        return b"\0" * self.offset + b"".join(opcode.opcode for opcode in self._opcodes)
 
     def get_position(self, searched):
-        position = 0
+        position = self.offset
         for mnemonic in self._opcodes:
             if mnemonic is searched:
                 return position
@@ -158,3 +159,7 @@ class Program(metaclass=ProgramMeta):
             name = "{}_{}".format(prefix, n)
             if name not in self.labels:
                 return name
+
+    def relocate(self, offset):
+        self.position = offset
+        self.offset = offset

@@ -465,3 +465,16 @@ rel:
     ]) == 0
 
     assert bin_file.read_binary() == yay_result
+
+
+def test_program_relocation():
+    class Test(Program):
+        def main(self):
+            INC()
+
+    test = Test()
+    test.relocate(0x8000)
+
+    not_relocated = Test()
+
+    assert test.to_binary() == b"\0" * 0x8000 + not_relocated.to_binary()
