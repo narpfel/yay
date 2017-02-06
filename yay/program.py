@@ -44,6 +44,7 @@ class sub:
         if self.was_called:
             Label(self.f.__name__)
             self.f(program)
+            ret()
 
 
 def is_macro(f):

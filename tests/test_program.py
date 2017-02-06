@@ -96,7 +96,6 @@ def test_sub():
         @sub
         def foo(self):
             inc()
-            ret()
 
         def main(self):
             nop()
