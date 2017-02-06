@@ -39,19 +39,29 @@ def main(argv=None):
         action="store_true"
     )
 
+    parser.add_argument(
+        "-f", "--format",
+        help="output format of the assembled program",
+        default="ihex"
+    )
+
     args = parser.parse_args(argv)
 
     main_class = get_main_class(import_yay_file(args.yay_file), args.main_class)
     program = main_class()
-    binary = program.to_binary()
+    output = getattr(program, "to_{}".format(args.format))()
 
     if args.outfile:
+        # TODO: Is always encoding `str`s (currently only returned by
+        # `to_ihex`) always right?
+        if isinstance(output, str):
+            output = output.encode()
         with open(args.outfile, "wb") as outfile:
-            outfile.write(binary)
+            outfile.write(output)
     elif args.print_raw:
-        sys.stdout.buffer.write(binary)
+        sys.stdout.buffer.write(output)
     else:
-        print(binary)
+        print(output)
 
 
 if __name__ == "__main__":

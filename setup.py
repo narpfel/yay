@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 requirements = [
     "setuptools",
     "PyYAML",
+    "IHex",
 ]
 
 setup(
@@ -21,6 +22,9 @@ setup(
         ]
     },
     install_requires=requirements,
+    dependency_links=[
+        "git+https://github.com/narpfel/IHex.git@master#egg=IHex-0.1.4"
+    ],
     license="GPLv3",
     zip_safe=True,
     keywords='yay',

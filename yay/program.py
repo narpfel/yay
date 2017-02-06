@@ -2,6 +2,8 @@ from contextlib import suppress, contextmanager
 from itertools import count
 from types import MethodType
 
+from ihex import IHex
+
 from yay.helpers import inject_names
 from yay.cpu import make_cpu
 
@@ -155,6 +157,15 @@ class Program(metaclass=ProgramMeta):
     def to_binary(self):
         self._assemble()
         return b"\0" * self.offset + self._code_as_bytes()
+
+    def to_ihex(self, as_str=True):
+        self._assemble()
+        ihex = IHex()
+        ihex.insert_data(self.offset, self._code_as_bytes())
+        if as_str:
+            return ihex.write()
+        else:
+            return ihex
 
     def get_position(self, searched):
         position = self.offset
