@@ -92,6 +92,8 @@ class Program(metaclass=ProgramMeta):
         self.position = 0
         self.offset = 0
 
+        self._was_assembled = False
+
     def _inject_macros(self, macros):
         for name, value in macros.items():
             if is_macro(value):
@@ -138,11 +140,21 @@ class Program(metaclass=ProgramMeta):
             )
         return converted
 
-    def to_binary(self):
+    def _assemble(self):
+        if self._was_assembled:
+            return
+
+        self._was_assembled = True
         self.main()
         for sub in self.subs:
             sub.emit_body(self)
-        return b"\0" * self.offset + b"".join(opcode.opcode for opcode in self._opcodes)
+
+    def _code_as_bytes(self):
+        return b"".join(opcode.opcode for opcode in self._opcodes)
+
+    def to_binary(self):
+        self._assemble()
+        return b"\0" * self.offset + self._code_as_bytes()
 
     def get_position(self, searched):
         position = self.offset
