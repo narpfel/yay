@@ -162,5 +162,9 @@ class Program(metaclass=ProgramMeta):
                 return name
 
     def relocate(self, offset):
+        if self.position != 0:
+            raise RuntimeError(
+                "Relocate must be called before program is assembled."
+            )
         self.position = offset
         self.offset = offset
