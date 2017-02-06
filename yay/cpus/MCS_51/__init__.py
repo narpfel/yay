@@ -11,6 +11,14 @@ class Macros:
         yield
         djnz(register, loop_head)
 
+    @block_macro
+    def using(self, *registers):
+        for reg in registers:
+            push(reg)
+        yield
+        for reg in reversed(registers):
+            pop(reg)
+
     @macro
     def new_label(self, prefix="label"):
         name = self.new_label_name(prefix)
