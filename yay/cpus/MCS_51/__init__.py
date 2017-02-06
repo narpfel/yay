@@ -6,9 +6,9 @@ class Macros:
     @block_macro
     def loop(self, register, n):
         mov(register, n)
-        Label("loop_head")
+        loop_head = self.new_label("loop_head_{}".format(register))
         yield
-        djnz(register, "loop_head")
+        djnz(register, loop_head)
 
     @macro
     def new_label(self, prefix="label"):
