@@ -4,8 +4,9 @@ from yay.program import macro, block_macro
 
 class Macros:
     @block_macro
-    def loop(self, register, n):
-        mov(register, n)
+    def loop(self, register, n=None):
+        if n is not None:
+            mov(register, n)
         loop_head = self.new_label("loop_head_{}".format(register))
         yield
         djnz(register, loop_head)
