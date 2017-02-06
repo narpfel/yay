@@ -72,3 +72,22 @@ def test_lsr():
             rrc()
 
     assert LsrTest().to_binary() == Expected().to_binary()
+
+
+def test_nested_loops():
+    class NestedLoopTest(Program):
+        def main(self):
+            with self.loop(R0, 2), self.loop(R1, 4):
+                nop()
+
+    class Expected(Program):
+        def main(self):
+            mov(R0, 2)
+            Label("loop_R0")
+            mov(R1, 4)
+            Label("loop_R1")
+            nop()
+            djnz(R1, "loop_R1")
+            djnz(R0, "loop_R0")
+
+    assert NestedLoopTest().to_binary() == Expected().to_binary()
