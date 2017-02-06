@@ -63,6 +63,9 @@ class Macros:
 
 
 class Accumulator:
+    def __init__(self):
+        self.direct_address = 0xe0
+
     def __add__(self, other):
         if isinstance(other, DPTR):
             return DptrOffset()
@@ -99,6 +102,7 @@ class Carry:
 
 class Register:
     def __init__(self, number, can_indirect=False):
+        self.program = None
         self.number = number
         self.can_indirect = can_indirect
         if can_indirect:
@@ -114,6 +118,18 @@ class Register:
 
     def __repr__(self):
         return "R{}()".format(self.number)
+
+    @property
+    def direct_address(self):
+        # TODO: Respect currently selected register bank
+        # return self.number + self.program.bank * 8
+        return self.number
+
+    def bind_program(self, program):
+        if self.program is not None:
+            raise RuntimeError("`Register.bind_program` called multiply")
+        self.program = program
+        return self
 
 
 class IndirectRegister:

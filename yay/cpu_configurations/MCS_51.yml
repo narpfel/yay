@@ -65,6 +65,13 @@ signature_contents:
     not_bit:
         length: 8
         short: null
+    pushpop_register:
+        length: 8
+        short: null
+        alternatives:
+            - "direct"
+            - "register"
+            - "accu"
     # And so on...
 mnemonics:
     acall:
@@ -430,15 +437,15 @@ mnemonics:
               - [0b_0100_0100]
               - ["immediate"]
     pop:
-        - signature: ["direct"]
+        - signature: ["pushpop_register"]
           opcode:
               - [0b1101_0000]
-              - ["direct"]
+              - ["pushpop_register"]
     push:
-        - signature: ["direct"]
+        - signature: ["pushpop_register"]
           opcode:
               - [0b1100_0000]
-              - ["direct"]
+              - ["pushpop_register"]
     ret:
         - signature: []
           opcode:

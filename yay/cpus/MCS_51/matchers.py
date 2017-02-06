@@ -1,5 +1,5 @@
 from yay.cpus.MCS_51 import (
-    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset, Carry, Label
+    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset, Carry, Label,
 )
 
 
@@ -72,3 +72,7 @@ def is_bit(candidate):
 
 def is_not_bit(candidate):
     return hasattr(candidate, "not_bit_addr") and candidate.not_bit_addr in range(256)
+
+
+def is_pushpop_register(candidate, from_alternative=False):
+    return from_alternative and candidate in range(256)

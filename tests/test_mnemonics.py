@@ -245,3 +245,19 @@ def test_repr():
             add_ = add(direct=Byte(42))
     Test().to_binary()
     assert repr(add_) == "add(direct=Byte(42))"
+
+
+def test_pop_acc():
+    class Test(Program):
+        def main(self):
+            pop(A)
+
+    assert Test().to_binary() == bytes([0b1101_0000, 0xe0])
+
+
+def test_pop_register():
+    class Test(Program):
+        def main(self):
+            pop(R1)
+
+    assert Test().to_binary() == bytes([0b1101_0000, 0x01])

@@ -1,5 +1,6 @@
 from yay.helpers import WrongSignatureException
 
+
 def addr16_from_label(mnemonic, label):
     return mnemonic.program.labels[label]
 
@@ -24,3 +25,15 @@ def addr11_from_addr16(mnemonic, addr16):
 
 def addr11_from_label(mnemonic, label):
     return addr11_from_addr16(mnemonic, addr16_from_label(mnemonic, label))
+
+
+def pushpop_register_from_accu(mnemonic, accu):
+    return accu.direct_address
+
+
+def pushpop_register_from_register(mnemonic, register):
+    return register.direct_address
+
+
+def pushpop_register_from_direct(mnemonic, direct):
+    return direct.byte_addr
