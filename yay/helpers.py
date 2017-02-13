@@ -87,6 +87,10 @@ def inject_names(names):
     return decorator
 
 
+def bind_program(cls, program):
+    return type(cls.__name__, (cls, ), dict(program=program))
+
+
 def ignore_self(function):
     @wraps(function)
     def decorated(*args, **kwargs):

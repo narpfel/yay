@@ -1,4 +1,4 @@
-from yay.helpers import InvalidRegisterError
+from yay.helpers import InvalidRegisterError, bind_program
 from yay.program import macro, block_macro
 
 
@@ -248,9 +248,7 @@ class Label:
         self.name = name
         self.program.add_label(name)
 
-    @classmethod
-    def bind_program(cls, program):
-        return type(cls.__name__, (cls, ), dict(program=program))
+    bind_program = classmethod(bind_program)
 
 
 # TODO: Circular import. `yay.cpus.MCS_51` needs a `matcher` attribute in order

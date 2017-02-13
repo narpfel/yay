@@ -2,7 +2,7 @@ from functools import partial
 import re
 
 from yay.helpers import (
-    InvalidConfigError, WrongSignatureException, twos_complement
+    InvalidConfigError, WrongSignatureException, twos_complement, bind_program,
 )
 
 
@@ -54,9 +54,7 @@ class Mnemonic:
         if auto:
             self.program.append(self)
 
-    @classmethod
-    def bind_program(cls, program):
-        return type(cls.__name__, (cls, ), dict(program=program))
+    bind_program = classmethod(bind_program)
 
     @property
     def size(self):
