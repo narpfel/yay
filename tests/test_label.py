@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from yay.program import Program
+from yay import Program
 
 
 @fixture

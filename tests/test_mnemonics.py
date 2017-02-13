@@ -1,7 +1,8 @@
 from pytest import raises, mark
 
-from yay.program import Program as _Program
-from yay.helpers import InvalidRegisterError, WrongSignatureException
+from yay import (
+    Program as _Program, InvalidRegisterError, WrongSignatureException,
+)
 
 
 class Program(_Program, cpu="AT89S8253"):

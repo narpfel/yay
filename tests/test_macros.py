@@ -1,4 +1,4 @@
-from yay.program import Program as _Program
+from yay import Program as _Program
 
 
 class Program(_Program, cpu="AT89S8253"):

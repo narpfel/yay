@@ -5,7 +5,7 @@ from textwrap import dedent
 
 from pytest import raises, mark
 
-from yay.program import Program as _Program, block_macro, macro, sub
+from yay import Program as _Program, block_macro, macro, sub
 
 
 class Program(_Program, cpu="AT89S8253"):
