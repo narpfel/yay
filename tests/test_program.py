@@ -477,3 +477,15 @@ def test_program_relocation():
     not_relocated = Test()
 
     assert test.to_binary() == b"\0" * 0x8000 + not_relocated.to_binary()
+
+
+def test_add_binary_data():
+    class Test(Program):
+        def main(self):
+            Lit(42)
+            self.data_position = self.add_binary_data(bytes(range(12)))
+            Lit(27)
+
+    test = Test()
+    assert test.to_binary() == bytes([42, *range(12), 27])
+    assert test.data_position == 1

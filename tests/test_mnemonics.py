@@ -262,3 +262,12 @@ def test_pop_register():
             pop(R1)
 
     assert Test().to_binary() == bytes([0b1101_0000, 0x01])
+
+
+def test_Lit():
+    class Test(Program):
+        def main(self):
+            for i in range(10):
+                Lit(i)
+
+    assert Test().to_binary() == bytes(range(10))

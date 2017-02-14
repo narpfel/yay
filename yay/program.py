@@ -6,6 +6,7 @@ from ihex import IHex
 
 from yay.helpers import inject_names
 from yay.cpu import make_cpu
+from yay.mnemonic import Lit
 
 
 def macro(f):
@@ -198,3 +199,10 @@ class Program(metaclass=ProgramMeta):
             )
         self.position = offset
         self.offset = offset
+
+    @macro
+    def add_binary_data(self, data):
+        ptr = self.position
+        for byte in data:
+            Lit(byte)
+        return ptr

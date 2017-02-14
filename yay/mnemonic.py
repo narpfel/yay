@@ -180,3 +180,18 @@ class Mnemonic:
             if hasattr(self, "_init_kwargs")
             else "?"
         )
+
+
+class Lit(Mnemonic):
+    def __init__(self, byte, auto=True):
+        if byte not in range(2 ** 8):
+            raise WrongSignatureException(
+                "`byte` must be in range(256), not `{}`".format(byte)
+            )
+        self.signatures = [
+            {
+                "signature": [],
+                "opcode": [[byte]]
+            }
+        ]
+        super().__init__(auto=auto)

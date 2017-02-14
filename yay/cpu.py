@@ -5,7 +5,7 @@ from importlib import import_module
 from yay.helpers import (
     read_config, config_filename, recursive_merge, reverse_dict
 )
-from yay.mnemonic import make_mnemonics
+from yay.mnemonic import make_mnemonics, Lit
 
 
 def _import_object(from_, name):
@@ -100,4 +100,5 @@ def get_cpu_definition(cpu_name):
 def make_cpu(cpu_name):
     config = read_cpu_config(get_cpu_definition(cpu_name))
     config["mnemonics"] = make_mnemonics(config)
+    config["mnemonics"]["Lit"] = Lit
     return config
