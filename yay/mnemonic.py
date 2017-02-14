@@ -2,7 +2,8 @@ from functools import partial
 import re
 
 from yay.helpers import (
-    InvalidConfigError, WrongSignatureException, twos_complement, bind_program,
+    InvalidConfigError, WrongSignatureException, twos_complement,
+    with_bind_program,
 )
 
 
@@ -25,6 +26,7 @@ def make_mnemonics(config):
     }
 
 
+@with_bind_program
 class Mnemonic:
     _SHORT_BIT_FORMAT = re.compile(r"(\w)(\d+)")
 
@@ -53,8 +55,6 @@ class Mnemonic:
 
         if auto:
             self.program.append(self)
-
-    bind_program = classmethod(bind_program)
 
     @property
     def size(self):

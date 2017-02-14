@@ -87,8 +87,13 @@ def inject_names(names):
     return decorator
 
 
-def bind_program(cls, program):
+def _bind_program(cls, program):
     return type(cls.__name__, (cls, ), dict(program=program))
+
+
+def with_bind_program(cls):
+    cls.bind_program = classmethod(_bind_program)
+    return cls
 
 
 def ignore_self(function):
