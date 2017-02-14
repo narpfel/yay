@@ -96,6 +96,7 @@ class Program(metaclass=ProgramMeta):
             self.subs.extend(filter(is_sub, vars(cls).values()))
 
         self.labels = {}
+        self.used_labels = set()
         self.position = 0
         self.offset = 0
 
@@ -186,7 +187,8 @@ class Program(metaclass=ProgramMeta):
     def new_label_name(self, prefix):
         for n in count():
             name = "{}_{}".format(prefix, n)
-            if name not in self.labels:
+            if name not in self.used_labels:
+                self.used_labels.add(name)
                 return name
 
     def relocate(self, offset):
