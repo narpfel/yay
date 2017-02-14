@@ -32,19 +32,24 @@ class sub:
         self.f = macro(f)
         self.is_macro = True
         self.is_sub = True
-        self.was_called = False
+        self.unique_name = None
+
+    @property
+    def was_called(self):
+        return self.unique_name is not None
 
     def _add_names(self, names):
         self.f._add_names(names)
         self.emit_body = inject_names(names)(self.emit_body)
 
     def __call__(self, program):
-        self.was_called = True
-        program.call(self.f.__name__)
+        if self.unique_name is None:
+            self.unique_name = program.new_label_name(self.f.__name__)
+        program.call(self.unique_name)
 
     def emit_body(self, program):
         if self.was_called:
-            Label(self.f.__name__)
+            program.add_label(self.unique_name)
             self.f(program)
             ret()
 
