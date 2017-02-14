@@ -44,6 +44,10 @@ class Macros:
         lcall(label)
 
     @macro
+    def ret(self):
+        ret()
+
+    @macro
     def clear_port(self, port, bit_mask):
         andl(port, bit_mask)
 

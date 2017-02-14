@@ -51,7 +51,7 @@ class sub:
         if self.was_called:
             program.add_label(self.unique_name)
             self.f(program)
-            ret()
+            program.ret()
 
 
 def is_macro(f):
