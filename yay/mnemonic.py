@@ -188,6 +188,7 @@ class Lit(Mnemonic):
             raise WrongSignatureException(
                 "`byte` must be in range(256), not `{}`".format(byte)
             )
+        self.byte = byte
         self.signatures = [
             {
                 "signature": [],
