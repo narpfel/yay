@@ -1,5 +1,6 @@
 from functools import wraps, lru_cache
 from copy import deepcopy
+from importlib.machinery import SourceFileLoader
 from types import FunctionType, MethodType
 from collections.abc import Mapping
 from pkg_resources import resource_filename
@@ -101,3 +102,7 @@ def ignore_self(function):
     def decorated(*args, **kwargs):
         return function(*args, **kwargs)
     return decorated
+
+
+def import_yay_file(yay_filename):
+    return SourceFileLoader("main", yay_filename).load_module()
