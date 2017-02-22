@@ -12,6 +12,26 @@ class Macros:
         djnz(register, loop_head)
 
     @block_macro
+    def until(self, operand, value):
+        loop_head = self.new_label("until_{}_!=_{}".format(operand, value))
+        yield
+        cjne(operand, value, loop_head)
+
+    @block_macro
+    def ifeq(self, operand, value):
+        not_equal = self.new_label_name("not_equal")
+        cjne(operand, value, not_equal)
+        yield
+        Label(not_equal)
+
+    @block_macro
+    def skip(self):
+        down = self.new_label_name("down")
+        ljmp(down)
+        yield
+        Label(down)
+
+    @block_macro
     def using(self, *registers):
         for reg in registers:
             push(reg)
@@ -72,6 +92,11 @@ class Macros:
     def lsr(self):
         clr(C)
         rrc()
+
+    @macro
+    def sub(self, subtrahend):
+        clr(C)
+        subb(subtrahend)
 
 
 class Accumulator:
