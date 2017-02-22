@@ -1,0 +1,15 @@
+from yay import Program, macro
+
+
+class Main(Program, cpu="MCS_51"):
+    def main(self):
+        self.uart = BlockingUart()
+
+        mov(SP, 0x30)
+
+        self.uart.setup()
+
+        with self.infinitely():
+            self.uart.read_byte()
+            std(P1)
+            self.uart.write_byte()

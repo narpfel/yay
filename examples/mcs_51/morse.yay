@@ -1,0 +1,254 @@
+from yay import Program, sub, macro
+
+
+LETTER_TO_MORSE = {
+    "A": ".-",
+    "B": "-...",
+    "C": "-.-.",
+    "D": "-..",
+    "E": ".",
+    "F": "..-.",
+    "G": "--.",
+    "H": "....",
+    "I": "..",
+    "J": ".---",
+    "K": "-.-",
+    "L": ".-..",
+    "M": "--",
+    "N": "-.",
+    "O": "---",
+    "P": ".--.",
+    "Q": "--.-",
+    "R": ".-.",
+    "S": "...",
+    "T": "-",
+    "U": "..-",
+    "V": "...-",
+    "W": ".--",
+    "X": "-..-",
+    "Y": "-.--",
+    "Z": "--..",
+    # FIXME: Umlauts are not a single byte long and thus unsuitable for
+    # the current lookup table implementation.
+    # "Ä": ".-.-",
+    # "Ö": "---.",
+    # "Ü": "..--",
+    # "CH": "----",
+}
+
+
+MULTILETTER_MORSE = {
+    ".": "AAA",
+    ",": "MIM",
+    ":": "OS",
+    ";": "NNN",
+    "?": "IMI",
+    "-": "BA",
+    "_": "UK",
+    "(": "KN",
+    ")": "KK",
+    "'": "JN",
+    "=": "BT",
+    "+": "AR",
+    "/": "DN",
+    "@": "AC",
+    "<": "SOS",
+}
+
+
+LED_ON = 0
+LED_OFF = 0xff
+
+
+class Main(Program, cpu="MCS_51"):
+    F_CPU = 22118400
+
+    message = (
+        "This is a test message. It tests the yay assembler. It even supports"
+        " commas and parentheses (like this)."
+    )
+
+    def main(self):
+        self.last_char = R5
+        self.position_in_message = R6
+        self.output_port = P1
+
+        with self.skip():
+            self.uart = BlockingUart()
+            self.delay = Delay()
+            self.multiletter_morse = LookupTableDptr(
+                {
+                    ord(key): value.encode("ascii")
+                    for (key, value) in MULTILETTER_MORSE.items()
+                },
+                4
+            )
+            self.letter_to_morse = LookupTableDptr(
+                {
+                    ord(letter): bytes([to_short_binary(morse_code)])
+                    for (letter, morse_code) in LETTER_TO_MORSE.items()
+                },
+                1
+            )
+
+            message = list(encode_bytes(self.message.upper().encode()))
+            self.message = self.add_binary_data(message)
+            self.message_length = Lit(len(message))
+
+        mov(SP, 0x30)
+        self.uart.setup()
+
+        with self.infinitely():
+            mov(self.last_char, 0)
+            mov(self.position_in_message, 0)
+
+            for char in "KA":
+                self.morse_fixchar(char)
+            self.letter_pause()
+
+            with self.until(self.position_in_message, self.message_length.byte):
+                self.load_char()
+                self.decode_char()
+                self.morse_char()
+
+            for char in "AR":
+                self.morse_fixchar(char)
+            self.letter_pause()
+            self.word_pause()
+            self.debug("\n")
+
+    @macro
+    def load_char(self):
+        mov(DPTR, self.message)
+        ldr(self.position_in_message)
+        lpm(at(A + DPTR))
+        inc(self.position_in_message)
+
+    @macro
+    def decode_char(self):
+        self.sub(self.last_char)
+        str(self.last_char)
+
+    @sub
+    def morse_char(self):
+        """Morse the character stored in `A`."""
+        with self.ifeq(A, ord(" ")):
+            # send word gap if char is space
+            self.word_pause()
+            ret()
+
+        # check if regular char
+        self.letter_to_morse.in_range()
+        jnc("not_a_regular_char")
+
+        self.letter_to_morse.lookup_unsafe()
+        self.morse_symbol()
+        self.letter_pause()
+        ret()
+
+        Label("not_a_regular_char")
+        self.multiletter_morse.in_range()
+        jnc("not_a_valid_morse_char")
+        self.multiletter_morse.lookup_unsafe()
+        mov(R4, B)
+        with self.until(A, 0):
+            self.letter_to_morse.lookup_unsafe()
+            self.morse_symbol()
+            ldr(R4)
+            mov(DPTR, self.multiletter_morse.position)
+            lpm(at(A + DPTR))
+            inc(R4)
+        self.letter_pause()
+        ret()
+
+        Label("not_a_valid_morse_char")
+        self.debug("!")
+
+    @macro
+    def morse_fixchar(self, char):
+        ldi(ord(char))
+        self.letter_to_morse.lookup_unsafe()
+        self.morse_symbol()
+
+    @sub
+    def morse_symbol(self):
+        symbol = R0
+        str(symbol)
+        swap()
+        andl(0x0f)
+        mask = R1
+        str(mask)
+        ldr(symbol)
+        andl(0x0f)
+
+        with self.infinitely():
+            ldr(mask)
+            clr(C)
+            rrc()
+            jnc("symbol_end")
+            str(mask)
+
+            ldr(symbol)
+            clr(C)
+            rrc()
+            str(symbol)
+            jc("dah")
+            self.dit()
+            with self.skip():
+                Label("dah")
+                self.dah()
+            self.symbol_pause()
+
+        Label("symbol_end")
+
+    @sub
+    def dit(self):
+        mov(self.output_port, LED_ON)
+        self.debug(".")
+        self.symbol_pause()
+        mov(self.output_port, LED_OFF)
+
+    @sub
+    def dah(self):
+        mov(self.output_port, LED_ON)
+        self.debug("-")
+        for _ in range(3):
+            self.symbol_pause()
+        mov(self.output_port, LED_OFF)
+
+    @sub
+    def symbol_pause(self):
+        self.delay.ms(100)
+
+    @sub
+    def letter_pause(self):
+        self.debug(" ")
+        for _ in range(3):
+            self.symbol_pause()
+
+    @sub
+    def word_pause(self):
+        for _ in range(4):
+            self.debug(" ")
+            self.symbol_pause()
+
+    @macro
+    def debug(self, letter):
+        with self.using(A):
+            ldi(ord(letter))
+            self.uart.write_byte()
+
+
+def to_short_binary(code):
+    result = 0
+    for i, symbol in enumerate(code):
+        result |= 1 << (i + 4)
+        result |= (symbol == "-") << i
+    return result
+
+
+def encode_bytes(bytes):
+    last = 0
+    for byte in bytes:
+        yield byte + last % 256
+        last = byte

@@ -1,0 +1,15 @@
+from yay import Program, sub, macro
+
+
+class Main(Program, cpu="MCS_51"):
+    F_CPU = 22118400
+
+    def main(self):
+        self.delay = Delay()
+
+        mov(SP, 0x30)
+        with self.infinitely():
+            std(P1)
+            cpl()
+            for _ in range(4):
+                self.delay.ms(250)
