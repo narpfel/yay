@@ -279,6 +279,145 @@ class Label:
         self.program.add_label(name)
 
 
+class LookupTableDptr(Mod):
+    def __init__(self, value_map, itemlength):
+        super().__init__()
+        self.itemlength = itemlength
+        items = sorted(value_map.items())
+        self.minimum = items[0][0]
+        self.maximum = items[-1][0]
+        table = bytearray(itemlength * (self.maximum - self.minimum + 1))
+
+        for (key, value) in items:
+            key -= self.minimum
+            length = len(value)
+            if length < itemlength:
+                value += b"\0" * (itemlength - length)
+            table[key * itemlength:key * (itemlength + 1)] = value
+
+        self.position = self.program.add_binary_data(table)
+
+    @sub
+    def lookup(self):
+        """
+        Lookup `A`, returning the value in `A`.
+
+        Iff `self` does not contain `A`, `C` is set and the contents of `A`
+        are not changed.
+        """
+        not_in_range = self.new_label_name("not_in_range")
+
+        self.in_range.direct()
+        jnc(not_in_range)
+
+        self.lookup_unsafe.direct()
+        ret()
+
+        Label(not_in_range)
+        set(C)
+
+    @sub
+    def in_range(self):
+        """Check if `A` is in range of this LUT, i. e. is a possible value."""
+        self.program.sub(self.minimum)
+        stb(F0)
+        self.program.sub(self.maximum - self.minimum)
+        andl(~F0)
+        stb(F0)
+        add(self.maximum)
+        ldb(F0)
+
+    @sub
+    def lookup_unsafe(self):
+        self.program.sub(self.minimum)
+        if self.itemlength == 1:
+            pass
+        elif self.itemlength == 2:
+            self.lsr()
+        else:
+            mov(B, self.itemlength)
+            mul()
+        std(B)
+        if self.itemlength != 1:
+            inc(B)
+        mov(DPTR, self.position)
+        lpm(at(A + DPTR))
+
+
+class BlockingUart(Mod):
+    """
+    TODO: Generalize. Currently, `setup` assumes `F_CPU = 22118400` and
+    a baudrate of 9600.
+    """
+    @macro
+    def setup(self):
+        mov(TH1, 244)
+        ldd(TMOD)
+        andl(0x0F)
+        add(0x20)
+        std(TMOD)
+        clr(SM0)
+        set(SM1)
+        set(TR1)
+        ldd(PCON)
+        orl(0x80)
+        std(PCON)
+        set(REN)
+        set(TI)
+        clr(RI)
+
+    @macro
+    def read_byte(self):
+        self.program.wait_on(RI)
+        ldd(SBUF)
+        clr(RI)
+
+    @macro
+    def write_byte(self):
+        self.program.wait_on(TI)
+        std(SBUF)
+        clr(TI)
+
+
+class Delay(Mod):
+    def __init__(self):
+        super().__init__()
+        # TODO: Currently does not account for x2 mode.
+        self.cycles_per_ms = self.program.F_CPU / 12 / 1000
+        self.inner_loop_count = 22
+        inner_loop_cycles = 4
+        inner_loop_total = inner_loop_cycles * self.inner_loop_count
+        self.outer_loop_count = int(self.cycles_per_ms / (inner_loop_total + 4))
+        elapsed_per_ms = (inner_loop_total + 4) * self.outer_loop_count
+        self.delta = int(self.cycles_per_ms - elapsed_per_ms + 0.5)
+
+    @macro
+    def ms(self, time):
+        if time > 0:
+            ldi(time)
+            self._delay_ms()
+
+    @sub
+    def _delay_ms(self):
+        """Busy wait for `A` ms."""
+        with self.program.using(R0, R1, R2):
+            str(R0)
+            with self.program.loop(R0):
+                self._delay_one_ms()
+
+    @macro
+    def _delay_one_ms(self):
+        with self.program.loop(R1, self.outer_loop_count):
+            with self.program.loop(R2, self.inner_loop_count):
+                nop()
+                nop()
+        if self.delta >= 5:
+            with self.program.loop(R1, (self.delta - 2) // 3):
+                nop()
+        else:
+            for _ in range(self.delta):
+                nop()
+
 
 # TODO: Circular import. `yay.cpus.MCS_51` needs a `matcher` attribute in order
 # for `yay.cpu._import_object` to work correctly. Should `_import_object` be
