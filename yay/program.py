@@ -4,7 +4,7 @@ from types import MethodType
 
 from ihex import IHex
 
-from yay.helpers import inject_names
+from yay.helpers import inject_names, with_bind_program
 from yay.cpu import make_cpu
 from yay.mnemonic import Lit
 
@@ -13,8 +13,10 @@ def macro(f):
     # Make sure each macro has its own `__globals__` dict so `add_names` can
     # `update` it without affecting other global namespaces.
     f = inject_names({})(f)
+
     def add_names(names):
         f.__globals__.update(names)
+
     f._add_names = add_names
     f.is_macro = True
     return f
@@ -34,6 +36,7 @@ class sub:
         self.is_macro = True
         self.is_sub = True
         self.unique_name = None
+        self.containing = None
 
     @property
     def was_called(self):
@@ -44,6 +47,9 @@ class sub:
         self.emit_body = inject_names(names)(self.emit_body)
 
     def __call__(self, program):
+        if not isinstance(program, Program):
+            self.containing = program
+            program = program.program
         if self.unique_name is None:
             self.unique_name = program.new_label_name(self.f.__name__)
         program.call(self.unique_name)
@@ -51,8 +57,11 @@ class sub:
     def emit_body(self, program):
         if self.was_called:
             program.add_label(self.unique_name)
-            self.f(program)
+            self.f(program if self.containing is None else self.containing)
             program.ret()
+
+    def clone(self):
+        return type(self)(self.f)
 
 
 def is_macro(f):
@@ -206,3 +215,18 @@ class Program(metaclass=ProgramMeta):
         for byte in data:
             Lit(byte)
         return ptr
+
+
+@with_bind_program
+class Mod:
+    def __init__(self):
+        for name in dir(self):
+            value = getattr(self, name)
+            if is_macro(value):
+                with suppress(AttributeError):
+                    value = value.clone()
+                value._add_names(self.program._cpu_namespace)
+                if is_sub(value):
+                    self.program.subs.append(value)
+                    value = MethodType(value, self)
+                setattr(self, name, value)

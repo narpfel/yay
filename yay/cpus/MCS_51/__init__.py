@@ -1,4 +1,4 @@
-from yay import macro, block_macro, sub, InvalidRegisterError
+from yay import macro, block_macro, sub, InvalidRegisterError, Mod
 from yay.helpers import with_bind_program
 
 
