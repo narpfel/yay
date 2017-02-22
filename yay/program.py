@@ -67,6 +67,12 @@ class sub:
             self.f(program if self.containing is None else self.containing)
             program.ret()
 
+    def __repr__(self):
+        return (
+            f"<sub object at {id(self):#x}, {self.f.__name__}, "
+            f"was_called={self.was_called}, name={self.unique_name}>"
+        )
+
     def clone(self):
         return type(self)(self.f)
 
