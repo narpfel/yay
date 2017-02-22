@@ -148,20 +148,18 @@ class Program(metaclass=ProgramMeta):
             args.append(from_alternative)
         return getattr(
             self.cpu["parse_helpers"]["matchers"],
-            "is_{}".format(typename)
+            f"is_{typename}"
         )(*args)
 
     def convert(self, mnemonic, from_, to, value):
         converted = getattr(
             self.cpu["parse_helpers"]["converters"],
-            "{}_from_{}".format(to, from_)
+            f"{to}_from_{from_}"
         )(mnemonic, value)
         if not self._matches_specific(to, converted, from_alternative=True):
             raise ValueError(
-                "Could not match {!r} (converted from {!r} ({!r})) as type {!r}"
-                .format(
-                    converted, value, from_, to
-                )
+                f"Could not match {converted!r} (converted from {value!r}"
+                f" ({from_!r})) as type {to!r}"
             )
         return converted
 
@@ -196,14 +194,14 @@ class Program(metaclass=ProgramMeta):
             if mnemonic is searched:
                 return position
             position += mnemonic.size
-        raise ValueError("{} is not in this program.".format(searched))
+        raise ValueError(f"{searched} is not in this program.")
 
     def offsetof(self, label):
         return self.position - self.labels[label]
 
     def new_label_name(self, prefix):
         for n in count():
-            name = "{}_{}".format(prefix, n)
+            name = f"{prefix}_{n}"
             if name not in self.used_labels:
                 self.used_labels.add(name)
                 return name

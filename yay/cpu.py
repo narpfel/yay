@@ -94,7 +94,7 @@ def get_cpu_definition(cpu_name):
     if isinstance(cpu_name, Path) or os.path.isabs(cpu_name):
         return str(cpu_name)
     else:
-        return config_filename("cpu_configurations/{}.yml".format(cpu_name))
+        return config_filename(f"cpu_configurations/{cpu_name}.yml")
 
 
 def make_cpu(cpu_name):

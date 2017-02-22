@@ -63,7 +63,7 @@ def twos_complement(number, bits, ranged=True):
     """
     allowed_values = range(-2**(bits - 1), 2**bits)
     if ranged and number not in allowed_values:
-        raise ValueError("`number` not in `{}`".format(allowed_values))
+        raise ValueError(f"`number` not in `{allowed_values}`")
     return number & (2 ** bits - 1)
 
 

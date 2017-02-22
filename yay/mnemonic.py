@@ -89,9 +89,8 @@ class Mnemonic:
                 return signature
 
         raise WrongSignatureException(
-            "Cannot call {} with this signature: {!r}, {!r}".format(
-                self.__class__.__name__, args, kwargs
-            )
+            f"Cannot call {self.__class__.__name__} with this signature: "
+            f"{args!r}, {kwargs!r}"
         )
 
     def matches_args(self, args, argument_format):
@@ -140,8 +139,7 @@ class Mnemonic:
             return result
         else:
             raise InvalidConfigError(
-                "`byte_format` length must be either 1 or 8, not {}"
-                .format(len(byte_format))
+                f"`byte_format` length must be either 1 or 8, not {len(byte_format)}"
             )
 
     def try_match_byte(self, byte_format):
@@ -171,22 +169,21 @@ class Mnemonic:
         return get_bit(int(self.try_match_byte(typename)), digit)
 
     def __repr__(self):
-        return "{name}({args})".format(
-            name=self.__class__.__name__,
-            args=", ".join(
-                "{}={}".format(name, value)
+        if hasattr(self, "_init_kwargs"):
+            args = ", ".join(
+                f"{name}={value}"
                 for name, value in self._init_kwargs.items()
             )
-            if hasattr(self, "_init_kwargs")
-            else "?"
-        )
+        else:
+            args = "?"
+        return f"{self.__class__.__name__}({args})"
 
 
 class Lit(Mnemonic):
     def __init__(self, byte, auto=True):
         if byte not in range(2 ** 8):
             raise WrongSignatureException(
-                "`byte` must be in range(256), not `{}`".format(byte)
+                f"`byte` must be in range(256), not `{byte}`"
             )
         self.byte = byte
         self.signatures = [

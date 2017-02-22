@@ -51,7 +51,7 @@ def main(argv=None):
 
     main_class = _get_main_class(import_yay_file(args.yay_file), args.main_class)
     program = main_class()
-    output = getattr(program, "to_{}".format(args.format))()
+    output = getattr(program, f"to_{args.format}")()
 
     if args.outfile:
         # TODO: Is always encoding `str`s (currently only returned by

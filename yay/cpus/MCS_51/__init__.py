@@ -7,13 +7,13 @@ class Macros:
     def loop(self, register, n=None):
         if n is not None:
             mov(register, n)
-        loop_head = self.new_label("loop_head_{}".format(register))
+        loop_head = self.new_label(f"loop_head_{register}")
         yield
         djnz(register, loop_head)
 
     @block_macro
     def until(self, operand, value):
-        loop_head = self.new_label("until_{}_!=_{}".format(operand, value))
+        loop_head = self.new_label(f"until_{operand}_!=_{value}")
         yield
         cjne(operand, value, loop_head)
 
@@ -47,7 +47,7 @@ class Macros:
 
     @macro
     def wait_on(self, bit):
-        label = self.new_label("wait_on_{}".format(bit))
+        label = self.new_label(f"wait_on_{bit}")
         jnb(bit, label)
 
     @block_macro
@@ -151,10 +151,10 @@ class Register:
         return self.number
 
     def __str__(self):
-        return "R{}".format(self.number)
+        return f"R{self.number}"
 
     def __repr__(self):
-        return "R{}()".format(self.number)
+        return f"R{self.number}()"
 
     @property
     def direct_address(self):
@@ -179,10 +179,10 @@ class IndirectRegister:
         return self.indirect_number
 
     def __str__(self):
-        return "IR{}".format(self.indirect_number)
+        return f"IR{self.indirect_number}"
 
     def __repr__(self):
-        return "IR{}()".format(self.indirect_number)
+        return f"IR{self.indirect_number}()"
 
 
 class Byte:
@@ -193,15 +193,14 @@ class Byte:
         return self.byte_addr
 
     def __str__(self):
-        return "Byte({})".format(self.byte_addr)
+        return f"Byte({self.byte_addr})"
 
 
 class SFR(Byte):
     def __init__(self, name, byte_addr):
         if byte_addr not in range(128, 256):
             raise ValueError(
-                "`byte_addr` must be in range(128, 256), not {}"
-                .format(byte_addr)
+                f"`byte_addr` must be in range(128, 256), not {byte_addr}"
             )
         super().__init__(byte_addr)
         self.name = name
@@ -211,16 +210,14 @@ class SFR(Byte):
 
     def __getitem__(self, bit):
         if not self.bit_addressable:
-            raise TypeError("{} is not bit addressable".format(self))
+            raise TypeError(f"{self} is not bit addressable")
         return Bit(self.byte_addr + bit)
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
-        return "SFR(name={self.name!r}, byte_addr={self.byte_addr})".format(
-            self=self
-        )
+        return f"SFR(name={self.name!r}, byte_addr={self.byte_addr})"
 
 
 class Bit:
@@ -234,7 +231,7 @@ class Bit:
         return self.bit_addr
 
     def __repr__(self):
-        return "Bit({})".format(self.bit_addr)
+        return f"Bit({self.bit_addr})"
 
 
 class NotBit:
@@ -245,7 +242,7 @@ class NotBit:
         return self.not_bit_addr
 
     def __repr__(self):
-        return "~Bit({})".format(self.not_bit_addr)
+        return f"~Bit({self.not_bit_addr})"
 
 
 class NamedBit(Bit):
@@ -254,7 +251,7 @@ class NamedBit(Bit):
         self.name = name
 
     def __repr__(self):
-        return "Bit(name={s.name!r}, bit_addr={s.bit_addr})".format(s=self)
+        return f"Bit(name={self.name!r}, bit_addr={self.bit_addr})"
 
 
 def at(register):
@@ -265,11 +262,9 @@ def at(register):
         if register.can_indirect:
             return register.as_indirect
         else:
-            raise InvalidRegisterError(
-                "{} can not be used as indirect.".format(register)
-            )
+            raise InvalidRegisterError(f"{register} can not be used as indirect.")
     except AttributeError as err:
-        raise TypeError("Not a register: {!r}.".format(register)) from err
+        raise TypeError(f"Not a register: {register!r}.") from err
 
 
 @with_bind_program
