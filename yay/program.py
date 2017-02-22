@@ -42,6 +42,13 @@ class sub:
     def was_called(self):
         return self.unique_name is not None
 
+    def direct(self, *args, **kwargs):
+        """
+        TODO: Currently requires to explicitly pass the program instance
+        when called.
+        """
+        return self.f(*args, **kwargs)
+
     def _add_names(self, names):
         self.f._add_names(names)
         self.emit_body = inject_names(names)(self.emit_body)

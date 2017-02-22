@@ -1,4 +1,4 @@
-from yay import Program as _Program
+from yay import Program as _Program, sub
 
 
 class Program(_Program, cpu="AT89S8253"):
@@ -91,3 +91,19 @@ def test_nested_loops():
             djnz(R0, "loop_R0")
 
     assert NestedLoopTest().to_binary() == Expected().to_binary()
+
+
+def test_sub_direct():
+    class Test(Program):
+        def main(self):
+            self.test_sub.direct(self)
+
+        @sub
+        def test_sub(self):
+            nop()
+
+    class Expected(Program):
+        def main(self):
+            nop()
+
+    assert Test().to_binary() == Expected().to_binary()
