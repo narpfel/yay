@@ -1,6 +1,3 @@
-from yay.helpers import WrongSignatureException
-
-
 def addr16_from_label(mnemonic, label):
     return mnemonic.program.labels[label]
 

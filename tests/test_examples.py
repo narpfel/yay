@@ -1,6 +1,6 @@
+import shutil
 from itertools import chain
 from pathlib import Path
-import shutil
 
 from pytest import mark
 from ihex import IHex

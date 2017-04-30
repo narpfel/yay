@@ -1,8 +1,7 @@
-from pytest import raises, mark
+from pytest import mark, raises
 
-from yay import (
-    Program as _Program, InvalidRegisterError, WrongSignatureException,
-)
+from yay import Program as _Program
+from yay import InvalidRegisterError, WrongSignatureException
 
 
 class Program(_Program, cpu="AT89S8253"):
@@ -37,7 +36,6 @@ def test_ADD():
             add(R3)
             add(Byte(42))
     assert Test().to_binary() == bytes([0b00101011, 0b00100101, 42])
-
 
     class Test(Program):
         def main(self):
@@ -186,7 +184,6 @@ def test_SJMP_label():
             sjmp("begin")
 
     assert Test().to_binary() == bytes([0b10000000, 0b11111110])
-
 
 
 def test_AND():

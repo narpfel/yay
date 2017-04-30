@@ -1,5 +1,5 @@
 from yay.cpus.MCS_51 import (
-    Accumulator, DPTR, IndirectDptr, DptrOffset, PcOffset, Carry, Label,
+    Accumulator, Carry, DPTR, DptrOffset, IndirectDptr, Label, PcOffset
 )
 
 

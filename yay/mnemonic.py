@@ -1,5 +1,5 @@
-from functools import partial
 import re
+from functools import partial
 
 from yay.helpers import (
     InvalidConfigError, WrongSignatureException, twos_complement,

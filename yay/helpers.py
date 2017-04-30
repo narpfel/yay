@@ -1,10 +1,11 @@
 import ast
-from functools import wraps, lru_cache
-from copy import deepcopy
-from importlib.util import module_from_spec, spec_from_loader
-from importlib.machinery import SourceFileLoader
-from types import FunctionType, MethodType
 from collections.abc import Mapping
+from copy import deepcopy
+from functools import lru_cache, wraps
+from importlib.machinery import SourceFileLoader
+from importlib.util import module_from_spec, spec_from_loader
+from types import FunctionType, MethodType
+
 from pkg_resources import resource_filename
 
 from yaml import load

@@ -1,11 +1,11 @@
 import os.path
-from pathlib import Path
 from importlib import import_module
+from pathlib import Path
 
 from yay.helpers import (
-    read_config, config_filename, recursive_merge, reverse_dict
+    config_filename, read_config, recursive_merge, reverse_dict
 )
-from yay.mnemonic import make_mnemonics, Lit
+from yay.mnemonic import Lit, make_mnemonics
 
 
 def _import_object(from_, name):

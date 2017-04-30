@@ -1,10 +1,9 @@
-import pytest
-from pytest import raises, fixture
+from pytest import fixture, raises
 
-from yay.mnemonic import Mnemonic
-from yay import Program, InvalidRegisterError
+from yay import InvalidRegisterError, Program
 from yay.cpu import make_cpu
-from yay.cpus.MCS_51 import IndirectRegister, Byte, at, DptrOffset, matchers
+from yay.cpus.MCS_51 import Byte, DptrOffset, at
+from yay.mnemonic import Mnemonic
 
 
 # TODO: Dirty hack!

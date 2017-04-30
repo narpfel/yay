@@ -1,11 +1,11 @@
-from contextlib import contextmanager
 from functools import lru_cache
 from subprocess import call
 from textwrap import dedent
 
-from pytest import raises, mark
+from pytest import mark, raises
 
-from yay import Program as _Program, block_macro, macro, sub
+from yay import Program as _Program
+from yay import block_macro, macro, sub
 
 
 class Program(_Program, cpu="AT89S8253"):
@@ -130,7 +130,6 @@ def test_unused_sub_does_not_emit_body():
 def test_opcodes_in_class_body():
     class InBody(Program):
         add(R2)
-
 
     class InMain(Program):
         def main(self):

@@ -1,11 +1,11 @@
-from contextlib import suppress, contextmanager
+from contextlib import contextmanager, suppress
 from itertools import count
 from types import MethodType
 
 from ihex import IHex
 
-from yay.helpers import inject_names, with_bind_program
 from yay.cpu import make_cpu
+from yay.helpers import inject_names, with_bind_program
 from yay.mnemonic import Lit
 
 

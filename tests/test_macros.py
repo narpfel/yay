@@ -1,4 +1,5 @@
-from yay import Program as _Program, sub
+from yay import Program as _Program
+from yay import sub
 
 
 class Program(_Program, cpu="AT89S8253"):

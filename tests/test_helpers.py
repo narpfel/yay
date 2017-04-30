@@ -3,9 +3,8 @@ from textwrap import dedent
 from pytest import raises
 
 from yay.helpers import (
-    reverse_dict, twos_complement, read_config, recursive_merge
+    read_config, recursive_merge, reverse_dict, twos_complement
 )
-
 
 
 def test_reverse_dict():

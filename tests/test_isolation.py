@@ -1,4 +1,4 @@
-from pytest import raises, fixture, importorskip, mark
+from pytest import fixture, mark, raises
 
 from yay import Program
 from yay.cpu import make_cpu

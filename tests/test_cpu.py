@@ -1,8 +1,8 @@
-from pathlib import Path
-from textwrap import dedent
+import decimal
 import functools
 import itertools
-import decimal
+from pathlib import Path
+from textwrap import dedent
 
 from yay.cpu import make_cpu, read_cpu_config
 from yay.helpers import config_filename
