@@ -1,5 +1,7 @@
+import ast
 from functools import wraps, lru_cache
 from copy import deepcopy
+from importlib.util import module_from_spec, spec_from_loader
 from importlib.machinery import SourceFileLoader
 from types import FunctionType, MethodType
 from collections.abc import Mapping
@@ -104,5 +106,43 @@ def ignore_self(function):
     return decorated
 
 
+class MovTransformer(ast.NodeTransformer):
+    def visit_Compare(self, node):
+        is_mov = (
+            len(node.ops) == 1
+            and isinstance(node.ops[0], ast.Lt)
+            and isinstance(node.comparators[0], ast.UnaryOp)
+            and isinstance(node.comparators[0].op, ast.USub)
+        )
+        if not is_mov:
+            return node
+        else:
+            target = node.left
+            destination = node.comparators[0].operand
+            mov_node = ast.Call(
+                func=ast.Name(id="mov", ctx=ast.Load()),
+                args=[target, destination],
+                keywords=[]
+            )
+            ast.fix_missing_locations(mov_node)
+            return ast.copy_location(
+                mov_node,
+                node
+            )
+
+
+class YayFileLoader(SourceFileLoader):
+    def source_to_code(self, data, *args, **kwargs):
+        return super().source_to_code(
+            MovTransformer().visit(ast.parse(data)),
+            *args,
+            **kwargs
+        )
+
+
 def import_yay_file(yay_filename):
-    return SourceFileLoader("main", yay_filename).load_module()
+    loader = YayFileLoader("main", yay_filename)
+    spec = spec_from_loader(loader.name, loader)
+    module = module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module

@@ -1,0 +1,40 @@
+from yay import Program
+
+
+# TODO: Also test negative case, i. e. a `Compare` node that should not be
+# transformed into a `mov` call.
+
+
+class Main(Program, cpu="MCS_51"):
+    def main(self):
+        # register <- direct
+        R0 <- Byte(42)
+        # direct <- register
+        Byte(43) <- R1
+        # direct <- direct
+        Byte(27) <- Byte(123)
+        # direct <- indirect
+        Byte(5) <- at(R0)
+        # indirect <- direct
+        at(R1) <- Byte(6)
+        # register <- immediate
+        R5 <- 42
+        # direct <- immediate
+        Byte(17) <- 17
+        # indirect <- immediate
+        at(R1) <- 55
+        # dptr <- immediate16
+        DPTR <- 0x8000
+
+
+class Expected(Program, cpu="MCS_51"):
+    def main(self):
+        mov(R0, Byte(42))
+        mov(Byte(43), R1)
+        mov(Byte(27), Byte(123))
+        mov(Byte(5), at(R0))
+        mov(at(R1), Byte(6))
+        mov(R5, 42)
+        mov(Byte(17), 17)
+        mov(at(R1), 55)
+        mov(DPTR, 0x8000)

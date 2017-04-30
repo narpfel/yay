@@ -1,5 +1,6 @@
-from glob import glob
-from os import path
+from itertools import chain
+from pathlib import Path
+import shutil
 
 from pytest import mark
 from ihex import IHex
@@ -12,10 +13,25 @@ def read(hex_filename):
 
 
 @mark.parametrize(
-    "yay_filename", glob("examples/**/*.yay")
+    "yay_filename", chain(
+        Path("examples/").glob("**/*.yay"),
+        Path("tests/test_yay_files").glob("**/*.yay"),
+    )
 )
 def test_example(tmpdir, yay_filename):
-    expected_filename = path.splitext(yay_filename)[0] + ".hex"
+    expected_filename = yay_filename.with_suffix(".hex")
+    # Copy to tempdir to prevent bytecode caching
+    yay_filename = shutil.copy(yay_filename, tmpdir)
     test_file = tmpdir.join("output.hex")
+
     main([yay_filename, "-o", test_file.strpath])
-    assert read(test_file.strpath) == read(expected_filename)
+
+    if not expected_filename.exists():
+        expected_filename = tmpdir.join("expected.hex")
+        main([
+            yay_filename,
+            "-o", expected_filename.strpath,
+            "--main_class", "Expected",
+        ])
+
+    assert read(test_file) == read(expected_filename)
