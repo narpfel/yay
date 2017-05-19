@@ -94,7 +94,11 @@ class Macros:
         rrc()
 
     @macro
-    def sub(self, subtrahend):
+    def subt(self, subtrahend):
+        """
+        TODO: Name collision with `yay.sub`. For now, this is renamed to
+        `subt`, but a better name should be found.
+        """
         clr(C)
         subb(subtrahend)
 
@@ -314,9 +318,9 @@ class LookupTableDptr(Mod):
     @sub
     def in_range(self):
         """Check if `A` is in range of this LUT, i. e. is a possible value."""
-        self.program.sub(self.minimum)
+        self.program.subt(self.minimum)
         stb(F0)
-        self.program.sub(self.maximum - self.minimum)
+        self.program.subt(self.maximum - self.minimum)
         andl(~F0)
         stb(F0)
         add(self.maximum)
@@ -324,7 +328,7 @@ class LookupTableDptr(Mod):
 
     @sub
     def lookup_unsafe(self):
-        self.program.sub(self.minimum)
+        self.program.subt(self.minimum)
         if self.itemlength == 1:
             pass
         elif self.itemlength == 2:

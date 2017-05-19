@@ -126,7 +126,7 @@ class Main(Program, cpu="MCS_51"):
 
     @macro
     def decode_char(self):
-        self.sub(self.last_char)
+        self.subt(self.last_char)
         str(self.last_char)
 
     @sub
