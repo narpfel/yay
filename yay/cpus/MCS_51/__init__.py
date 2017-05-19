@@ -54,7 +54,7 @@ class Macros:
     def infinitely(self):
         loop = self.new_label("infinite_loop")
         yield
-        if self.offsetof(loop) >= -126:
+        if -127 < self.offsetof(loop) <= 128:
             sjmp(loop)
         else:
             ljmp(loop)

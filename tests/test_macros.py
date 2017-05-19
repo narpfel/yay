@@ -108,3 +108,20 @@ def test_sub_direct():
             nop()
 
     assert Test().to_binary() == Expected().to_binary()
+
+
+def test_ljmp_infinitely():
+    class Test(Program):
+        def main(self):
+            with self.infinitely():
+                for _ in range(1000):
+                    nop()
+
+    class Expected(Program):
+        def main(self):
+            Label("infinite_loop")
+            for _ in range(1000):
+                nop()
+            ljmp("infinite_loop")
+
+    assert Test().to_binary() == Expected().to_binary()
