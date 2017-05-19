@@ -72,8 +72,8 @@ def twos_complement(number, bits, ranged=True):
 
 def inject_names(names):
     def decorator(f):
-        f_globals = dict(names)
-        f_globals.update(getattr(f, "_initial_globals", f.__globals__))
+        f_globals = dict(getattr(f, "_initial_globals", f.__globals__))
+        f_globals.update(names)
 
         new_f = FunctionType(
             f.__code__,
