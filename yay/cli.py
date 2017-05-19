@@ -42,11 +42,6 @@ def main(argv=None):
         default="ihex"
     )
 
-    parser.add_argument(
-        "-u", "--upload",
-        action="store_true"
-    )
-
     args = parser.parse_args(argv)
 
     main_class = _get_main_class(import_yay_file(args.yay_file), args.main_class)
