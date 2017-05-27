@@ -451,12 +451,38 @@ class Delay(Mod):
         super().__init__()
         # TODO: Currently does not account for x2 mode.
         self.cycles_per_ms = self.program.F_CPU / 12 / 1000
+        self.cycles_per_us = self.cycles_per_ms / 1000
         self.inner_loop_count = 22
         inner_loop_cycles = 4
         inner_loop_total = inner_loop_cycles * self.inner_loop_count
         self.outer_loop_count = int(self.cycles_per_ms / (inner_loop_total + 4))
         elapsed_per_ms = (inner_loop_total + 4) * self.outer_loop_count
         self.delta = int(self.cycles_per_ms - elapsed_per_ms + 0.5)
+
+    @macro
+    def us(self, time):
+        """
+        Busy wait for `time` microseconds.
+
+        Clobbers
+        --------
+            R7
+        """
+        cycles = int(time * self.cycles_per_us + 0.5 - 2)
+        iterations, remaining_cycles = divmod(cycles, 4)
+        if iterations > 255:
+            max_cycles = 255 * 4 + 2
+            raise ValueError(
+                f"Cannot wait for {cycles} cycles, maximum is "
+                f"{max_cycles} cycles ({max_cycles / self.cycles_per_us}"
+                " us), use `ms` instead"
+            )
+        mov(R7, iterations)
+        if iterations > 0:
+            with self.program.loop(R7):
+                nop()
+        for _ in range(remaining_cycles):
+            nop()
 
     @macro
     def ms(self, time):
