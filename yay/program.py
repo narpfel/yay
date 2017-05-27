@@ -184,6 +184,18 @@ class Program(metaclass=ProgramMeta):
 
         self._was_assembled = True
         self.main()
+
+        # Recursively make sure all subs that are part of mods and only
+        # indirectly called (i. e. via another sub in a mod) are actually
+        # called so that they are known by the program.
+        # TODO: Refactor into either a better system or into own mathod.
+        old_append = self.append
+        self.append = lambda *args, **kwargs: None
+        for sub in self.subs:
+            if sub.was_called:
+                sub.f(self if sub.containing is None else sub.containing)
+        self.append = old_append
+
         for sub in self.subs:
             sub.emit_body(self)
 

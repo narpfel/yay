@@ -1,0 +1,31 @@
+from yay import Program, sub, Mod
+
+
+class Main(Program, cpu="MCS_51"):
+    def main(self):
+        self.sub_container = SubContainer()
+        self.sub_container.foo()
+
+
+@Main.mod
+class SubContainer(Mod):
+    @sub
+    def foo(self):
+        self.bar()
+
+    @sub
+    def bar(self):
+        R0 <- 42
+
+
+class Expected(Program, cpu="MCS_51"):
+    def main(self):
+        lcall("foo")
+
+        Label("bar")
+        R0 <- 42
+        ret()
+
+        Label("foo")
+        lcall("bar")
+        ret()
