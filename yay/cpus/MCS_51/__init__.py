@@ -398,9 +398,14 @@ class BlockingUart(Mod):
         clr(RI)
 
     @macro
-    def write_byte(self):
+    def write_byte(self, byte=None):
         self.program.wait_on(TI)
-        std(SBUF)
+        if byte is None:
+            std(SBUF)
+        else:
+            if isinstance(byte, (__builtins__["str"], bytes)) and len(byte) == 1:
+                byte = ord(byte)
+            mov(SBUF, byte)
         clr(TI)
 
 
