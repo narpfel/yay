@@ -102,6 +102,32 @@ class Macros:
         clr(C)
         subb(subtrahend)
 
+    @sub
+    def to_decimal(self):
+        """Convert the value stored in `A` to a 3-digit decimal string and
+        store it at `at(R0)`.
+
+        Clobbers
+        --------
+            at(R0) .. at(R0 + 3): output
+            A
+        """
+        with self.using(R1, R3):
+            for _ in range(2):
+                inc(R0)
+            str(R1)
+            with self.loop(R3, 2):
+                mov(B, 10)
+                div()
+                str(R1)
+                ldd(B)
+                add(ord("0"))
+                str(at(R0))
+                dec(R0)
+                ldr(R1)
+            add(ord("0"))
+            str(at(R0))
+
 
 class Accumulator:
     def __init__(self):
