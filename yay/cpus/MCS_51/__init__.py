@@ -408,6 +408,43 @@ class BlockingUart(Mod):
             mov(SBUF, byte)
         clr(TI)
 
+    @sub
+    def write_str(self):
+        """
+        Write string stored at `at(R0)` of length `R1`.
+
+        Clobbers
+        --------
+            A
+        """
+        with self.program.using(R0, R1), self.program.loop(R1):
+            ldr(at(R0))
+            inc(R0)
+            self.write_byte()
+
+    @sub
+    def write_byte_binary(self):
+        """
+        Write byte in `A` formatted as an unsigned binary number.
+
+        Example
+        -------
+            A = 42 => 0b00101010
+
+        Clobbers
+        --------
+            A
+        """
+        self.write_byte(ord("0"))
+        self.write_byte(ord("b"))
+        with self.program.using(R0, R1), self.program.loop(R0, 8):
+            rl()
+            str(R1)
+            andl(1)
+            add(ord("0"))
+            self.write_byte()
+            ldr(R1)
+
 
 class Delay(Mod):
     def __init__(self):
