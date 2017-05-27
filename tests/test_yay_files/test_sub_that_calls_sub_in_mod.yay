@@ -1,6 +1,10 @@
 from yay import Program, sub, Mod
 
 
+# FIXME: This test relies on the alphabetical ordering of dict keys introduced
+# in Python 3.6. As this is an implementation detail, this test is broken.
+
+
 class Main(Program, cpu="MCS_51"):
     def main(self):
         self.sub_container = SubContainer()
