@@ -94,6 +94,11 @@ class ProgramMeta(type):
         with suppress(KeyError):
             cls._cpu_name = kwargs["cpu"]
         cls._opcode_destination = kwargs.get("opcode_destination", list)
+        cls._mods = {}
+
+    def mod(cls, module):
+        cls._mods[module.__name__] = module
+        return module
 
 
 class Program(metaclass=ProgramMeta):
@@ -107,6 +112,10 @@ class Program(metaclass=ProgramMeta):
                     self._cpu_namespace[name] = item.bind_program(self)
                 except AttributeError:
                     self._cpu_namespace[name] = item
+
+        for name, mod in self._mods.items():
+            self._cpu_namespace[name] = mod.bind_program(self)
+
         if hasattr(self, "main"):
             self.main = inject_names(self._cpu_namespace)(self.main)
 

@@ -1,0 +1,27 @@
+from yay import Program, macro, Mod
+
+
+class Main(Program, cpu="MCS_51"):
+    def main(self):
+        test_mod = TestMod()
+        nop()
+        test_mod.macro_test()
+        nop()
+
+
+@Main.mod
+class TestMod(Mod):
+    @macro
+    def macro_test(self):
+        add(R2)
+        R7  <- 42
+        self.program.wait_on(TI)
+
+
+class Expected(Program, cpu="MCS_51"):
+    def main(self):
+        nop()
+        add(R2)
+        R7 <- 42
+        self.wait_on(TI)
+        nop()
