@@ -486,6 +486,12 @@ class Delay(Mod):
 
     @macro
     def ms(self, time):
+        """Wait for `time` milliseconds.
+
+        Clobbers
+        --------
+            A
+        """
         if time > 0:
             ldi(time)
             self._delay_ms()
