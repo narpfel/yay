@@ -16,7 +16,8 @@ def read(hex_filename):
     "yay_filename", chain(
         Path("examples/").glob("**/*.yay"),
         Path("tests/test_yay_files").glob("**/*.yay"),
-    )
+    ),
+    ids=lambda path: str(path),
 )
 def test_example(tmpdir, yay_filename):
     expected_filename = yay_filename.with_suffix(".hex")
