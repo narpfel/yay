@@ -709,7 +709,3 @@ class Ds18b20(OneWire):
             inc(R0)
 
 
-# TODO: Circular import. `yay.cpus.MCS_51` needs a `matcher` attribute in order
-# for `yay.cpu._import_object` to work correctly. Should `_import_object` be
-# changed so that it can import modules from packages?
-from yay.cpus.MCS_51 import matchers, converters

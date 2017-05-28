@@ -9,7 +9,10 @@ from yay.mnemonic import Lit, make_mnemonics
 
 
 def _import_object(from_, name):
-    return getattr(import_module(from_), name)
+    try:
+        return getattr(import_module(from_), name)
+    except AttributeError:
+        return import_module(f"{from_}.{name}")
 
 
 def _call_one(obj, name, args, with_key):
