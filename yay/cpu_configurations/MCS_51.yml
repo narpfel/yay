@@ -682,12 +682,6 @@ additional_names:
         import: "Bit"
     Label:
         import: "Label"
-    LookupTableDptr:
-        import: "LookupTableDptr"
-    BlockingUart:
-        import: "BlockingUart"
-    Delay:
-        import: "Delay"
 
 parse_helpers:
     matchers:

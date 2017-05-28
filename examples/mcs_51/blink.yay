@@ -1,8 +1,11 @@
 from yay import Program, sub, macro
+from yay.cpus.MCS_51 import Delay
 
 
 class Main(Program, cpu="MCS_51"):
     F_CPU = 22118400
+
+    mods = [Delay]
 
     def main(self):
         self.delay = Delay()

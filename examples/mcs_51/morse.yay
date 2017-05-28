@@ -1,4 +1,6 @@
 from yay import Program, sub, macro
+from yay.cpus.MCS_51 import Delay, LookupTableDptr
+from yay.cpus.MCS_51.uart import BlockingUart
 
 
 LETTER_TO_MORSE = {
@@ -62,6 +64,8 @@ LED_OFF = 0xff
 
 class Main(Program, cpu="MCS_51"):
     F_CPU = 22118400
+
+    mods = [Delay, BlockingUart, LookupTableDptr]
 
     message = (
         "This is a test message. It tests the yay assembler. It even supports"

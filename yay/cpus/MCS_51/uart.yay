@@ -1,0 +1,78 @@
+from yay import Mod, macro, sub
+
+
+class BlockingUart(Mod):
+    """
+    TODO: Generalize. Currently, `setup` assumes `F_CPU = 22118400` and
+    a baudrate of 9600.
+    """
+    @macro
+    def setup(self):
+        mov(TH1, 244)
+        ldd(TMOD)
+        andl(0x0F)
+        add(0x20)
+        std(TMOD)
+        clr(SM0)
+        set(SM1)
+        set(TR1)
+        ldd(PCON)
+        orl(0x80)
+        std(PCON)
+        set(REN)
+        set(TI)
+        clr(RI)
+
+    @macro
+    def read_byte(self):
+        self.program.wait_on(RI)
+        ldd(SBUF)
+        clr(RI)
+
+    @macro
+    def write_byte(self, byte=None):
+        self.program.wait_on(TI)
+        if byte is None:
+            std(SBUF)
+        else:
+            if isinstance(byte, (__builtins__["str"], bytes)) and len(byte) == 1:
+                byte = ord(byte)
+            mov(SBUF, byte)
+        clr(TI)
+
+    @sub
+    def write_str(self):
+        """
+        Write string stored at `at(R0)` of length `R1`.
+
+        Clobbers
+        --------
+            A
+        """
+        with self.program.using(R0, R1), self.program.loop(R1):
+            ldr(at(R0))
+            inc(R0)
+            self.write_byte()
+
+    @sub
+    def write_byte_binary(self):
+        """
+        Write byte in `A` formatted as an unsigned binary number.
+
+        Example
+        -------
+            A = 42 => 0b00101010
+
+        Clobbers
+        --------
+            A
+        """
+        self.write_byte(ord("0"))
+        self.write_byte(ord("b"))
+        with self.program.using(R0, R1), self.program.loop(R0, 8):
+            rl()
+            str(R1)
+            andl(1)
+            add(ord("0"))
+            self.write_byte()
+            ldr(R1)

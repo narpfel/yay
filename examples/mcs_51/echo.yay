@@ -1,7 +1,10 @@
 from yay import Program, macro
+from yay.cpus.MCS_51.uart import BlockingUart
 
 
 class Main(Program, cpu="MCS_51"):
+    mods = [BlockingUart]
+    
     def main(self):
         self.uart = BlockingUart()
 
