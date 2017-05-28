@@ -94,7 +94,10 @@ class ProgramMeta(type):
         with suppress(KeyError):
             cls._cpu_name = kwargs["cpu"]
         cls._opcode_destination = kwargs.get("opcode_destination", list)
-        cls._mods = {}
+        cls._mods = {
+            mod.__name__: mod
+            for mod in namespace.get("mods", [])
+        }
 
     def mod(cls, module):
         cls._mods[module.__name__] = module
