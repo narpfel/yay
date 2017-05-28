@@ -1,7 +1,5 @@
 from yay import Program, sub
 
-from yay.cpus.MCS_51 import Ds18b20
-
 
 class Main(Program, cpu="AT89S8253"):
     F_CPU = 22_118_400
