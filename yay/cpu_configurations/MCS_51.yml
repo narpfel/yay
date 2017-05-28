@@ -688,12 +688,6 @@ additional_names:
         import: "BlockingUart"
     Delay:
         import: "Delay"
-    Ds18b20:
-        import: "Ds18b20"
-        from: "yay.cpus.MCS_51.one_wire"
-    OneWire:
-        import: "OneWire"
-        from: "yay.cpus.MCS_51.one_wire"
 
 parse_helpers:
     matchers:

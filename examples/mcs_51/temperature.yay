@@ -1,8 +1,11 @@
 from yay import Program, sub
+from yay.cpus.MCS_51.one_wire import Ds18b20
 
 
 class Main(Program, cpu="AT89S8253"):
     F_CPU = 22_118_400
+
+    mods = [Ds18b20]
 
     def main(self):
         with self.skip():
