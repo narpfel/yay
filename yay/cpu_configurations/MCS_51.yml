@@ -692,6 +692,7 @@ parse_helpers:
 macros_from:
     macros_from:
         import: "Macros"
+        from: "yay.cpus.MCS_51.macros"
 
 importing:
     additional_names: "yay.cpus.MCS_51"

@@ -1,0 +1,128 @@
+from yay import macro, sub, block_macro
+
+
+class Macros:
+    @block_macro
+    def loop(self, register, n=None):
+        if n is not None:
+            mov(register, n)
+        loop_head = self.new_label(f"loop_head_{register}")
+        yield
+        djnz(register, loop_head)
+
+    @block_macro
+    def until(self, operand, value):
+        loop_head = self.new_label(f"until_{operand}_!=_{value}")
+        yield
+        cjne(operand, value, loop_head)
+
+    @block_macro
+    def ifeq(self, operand, value):
+        not_equal = self.new_label_name("not_equal")
+        cjne(operand, value, not_equal)
+        yield
+        Label(not_equal)
+
+    @block_macro
+    def skip(self):
+        down = self.new_label_name("down")
+        ljmp(down)
+        yield
+        Label(down)
+
+    @block_macro
+    def using(self, *registers):
+        for reg in registers:
+            push(reg)
+        yield
+        for reg in reversed(registers):
+            pop(reg)
+
+    @macro
+    def new_label(self, prefix="label"):
+        name = self.new_label_name(prefix)
+        Label(name)
+        return name
+
+    @macro
+    def wait_on(self, bit):
+        label = self.new_label(f"wait_on_{bit}")
+        jnb(bit, label)
+
+    @block_macro
+    def infinitely(self):
+        loop = self.new_label("infinite_loop")
+        yield
+        if -127 < self.offsetof(loop) <= 128:
+            sjmp(loop)
+        else:
+            ljmp(loop)
+
+    @macro
+    def call(self, label):
+        lcall(label)
+
+    @macro
+    def ret(self):
+        ret()
+
+    @macro
+    def clear_port(self, port, bit_mask):
+        andl(port, bit_mask)
+
+    @macro
+    def set_port(self, port, bit_mask):
+        orl(port, bit_mask)
+
+    @macro
+    def xor(self, left, right):
+        ldb(left)
+        label = self.new_label_name("skip_toggle")
+        jnb(right, label)
+        cpl(C)
+        Label(label)
+
+    @macro
+    def lsl(self):
+        clr(C)
+        rlc()
+
+    @macro
+    def lsr(self):
+        clr(C)
+        rrc()
+
+    @macro
+    def subt(self, subtrahend):
+        """
+        TODO: Name collision with `yay.sub`. For now, this is renamed to
+        `subt`, but a better name should be found.
+        """
+        clr(C)
+        subb(subtrahend)
+
+    @sub
+    def to_decimal(self):
+        """Convert the value stored in `A` to a 3-digit decimal string and
+        store it at `at(R0)`.
+
+        Clobbers
+        --------
+            at(R0) .. at(R0 + 3): output
+            A
+        """
+        with self.using(R1, R3):
+            for _ in range(2):
+                inc(R0)
+            str(R1)
+            with self.loop(R3, 2):
+                mov(B, 10)
+                div()
+                str(R1)
+                ldd(B)
+                add(ord("0"))
+                str(at(R0))
+                dec(R0)
+                ldr(R1)
+            add(ord("0"))
+            str(at(R0))
