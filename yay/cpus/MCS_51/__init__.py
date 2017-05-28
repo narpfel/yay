@@ -1,3 +1,5 @@
+from warnings import warn
+
 from yay import macro, block_macro, sub, InvalidRegisterError, Mod
 from yay.helpers import with_bind_program
 
@@ -516,6 +518,195 @@ class Delay(Mod):
         else:
             for _ in range(self.delta):
                 nop()
+
+
+class OneWire(Mod):
+    def __init__(self, pin):
+        super().__init__()
+        self.delay = self.program.delay
+        self.pin = pin
+
+    @macro
+    def initialize(self):
+        set(self.pin)
+
+    @sub
+    def reset(self):
+        """
+        Send reset pulse to the bus.
+
+        Clobbers
+        --------
+            C: Indicates whether device is present on bus.
+        """
+        clr(self.pin)
+        self.delay.us(500)
+        set(self.pin)
+        self.delay.us(65)
+        ldb(self.pin)
+        self.delay.us(500 - 65)
+
+    @macro
+    def write_byte(self, byte=None):
+        """
+        Write one byte to the bus.
+
+        `byte` is sent if given, else `A` is sent.
+
+        Clobbers
+        --------
+            A
+        """
+        if byte is not None:
+            ldi(byte)
+        self._write_byte()
+
+    @sub
+    def _write_byte(self):
+        # Write byte in `A`
+        with self.program.using(R0), self.program.loop(R0, 8):
+            rrc()
+            self.write_bit()
+
+    @sub
+    def read_byte(self):
+        """
+        Read one byte from the bus into `A`.
+
+        Clobbers
+        --------
+            A
+        """
+        # Read byte into `A`
+        swap()
+        with self.program.using(R0), self.program.loop(R0, 8):
+            self.read_bit()
+            rrc()
+
+    @sub
+    def write_bit(self):
+        """
+        Write one bit from `C` to the bus.
+
+        Clobbers
+        --------
+            R7: for microsecond delay
+        """
+        jnc("write_zero")
+
+        clr(self.pin)
+        self.delay.us(3)
+        set(self.pin)
+        self.delay.us(70)
+        ret()
+
+        Label("write_zero")
+        clr(self.pin)
+        self.delay.us(70)
+        set(self.pin)
+
+    @sub
+    def read_bit(self):
+        """
+        Read one bit from the bus into `C`.
+
+        Clobbers
+        --------
+            C: bit read from the bus
+            R7: for microsecond delay
+        """
+        clr(self.pin)
+        self.delay.us(3)
+        set(self.pin)
+        self.delay.us(8)
+        ldb(self.pin)
+        self.delay.us(50)
+
+
+class Ds18b20(OneWire):
+    COMMANDS = {
+        "search_rom": 0xf0,
+        "read_rom": 0x33,
+        "_match_rom": 0x55,
+        "skip_rom": 0xcc,
+        "alarm_search": 0xec,
+        "convert_t": 0x44,
+        "write_scratchpad": 0x4e,
+        "_read_scratchpad": 0xbe,
+        "copy_scratchpad": 0x48,
+        "recall_e2": 0xb8,
+        "read_power_supply": 0xb4,
+    }
+
+    def __init__(self, pin, single_drop):
+        super().__init__(pin)
+        self.single_drop = single_drop
+
+    def __getattr__(self, name):
+        if name in self.COMMANDS:
+            return lambda: self.write_byte(self.COMMANDS[name])
+        else:
+            raise AttributeError(f"`{self}` has not attribute `{name}`")
+
+    @sub
+    def match_rom(self):
+        """Match ROM using the address stored at `at(DPTR)`. Destroys `DPTR`.
+
+        Raises a `UserWarning` and issues a `skip_rom` command if in
+        single-drop mode.
+
+        Clobbers
+        --------
+            DPTR
+        """
+
+        if self.single_drop:
+            warn(
+                "Match ROM not necessary in single-drop mode, using `skip_rom`."
+            )
+            self.skip_rom()
+        else:
+            self._match_rom()
+            with self.program.using(R1), self.program.loop(R1, 8):
+                ldx(at(DPTR))
+                inc(DPTR)
+                self.write_byte()
+
+    @sub
+    def read_temperature(self):
+        """Read temperature from sensor with address stored at `at(DPTR)`.
+
+        Clobbers
+        --------
+            DPTR
+            R1
+        """
+        self.reset()
+        self.match_rom()
+        self.read_scratchpad(2)
+
+    @macro
+    def read_scratchpad(self, bytes):
+        """Read scratchpad into `at(R0)`.
+
+        Clobbers
+        --------
+            at(R0) .. at(R0 + bytes): scratchpad contents
+            R1
+        """
+        if bytes not in range(1, 10):
+            raise ValueError(f"`bytes` must be in range(1, 10), not `{bytes}`.")
+
+        mov(R1, bytes)
+        self._read_scratchpad_for_R1_bytes()
+
+    @sub
+    def _read_scratchpad_for_R1_bytes(self):
+        self._read_scratchpad()
+        with self.program.loop(R1):
+            self.read_byte()
+            str(at(R0))
+            inc(R0)
 
 
 # TODO: Circular import. `yay.cpus.MCS_51` needs a `matcher` attribute in order

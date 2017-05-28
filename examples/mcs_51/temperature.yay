@@ -1,0 +1,68 @@
+from yay import Program, sub
+
+from yay.cpus.MCS_51 import Ds18b20
+
+
+class Main(Program, cpu="AT89S8253"):
+    F_CPU = 22_118_400
+
+    def main(self):
+        with self.skip():
+            self.delay = Delay()
+            self.sensor = Ds18b20(P1[0], single_drop=False)
+            self.uart = BlockingUart()
+
+            self.sensor_address_pointers = [
+                # Red sensor
+                self.add_binary_data([
+                    0b0010_1000, 0b1111_1111, 0b1100_0110, 0b1010_1011,
+                    0b1001_0001, 0b0001_0101, 0b0000_0100, 0b0011_1010,
+                ]),
+                # Green sensor
+                self.add_binary_data([
+                    0b0010_1000, 0b1111_1111, 0b0001_1111, 0b1100_0111,
+                    0b1001_0001, 0b0001_0101, 0b0000_0011, 0b1001_0110,
+                ])
+            ]
+
+            self.message = Byte(0x30)
+            self.output_string = Byte(0x39)
+
+        SP <- 0x42
+
+        self.sensor.initialize()
+
+        self.sensor.reset()
+        jc("no_sensor")
+        self.uart.write_byte("s")
+        with self.skip():
+            Label("no_sensor")
+            self.uart.write_byte("n")
+
+        with self.infinitely():
+            self.uart.write_byte("\n")
+
+            self.sensor.reset()
+            self.sensor.skip_rom()
+            self.sensor.convert_t()
+
+            Label("conversion_running")
+            self.uart.write_byte(".")
+            self.delay.ms(50)
+            self.sensor.read_bit()
+            jnc("conversion_running")
+
+            for sensor_address_pointer in self.sensor_address_pointers:
+                DPTR <- sensor_address_pointer
+                R0 <- self.message.byte_addr
+                self.sensor.read_temperature()
+                R0 <- self.message.byte_addr
+                self.output_temperature()
+
+    @sub
+    def output_temperature(self):
+        with self.loop(R1, 2):
+            self.uart.write_byte(" ")
+            ldr(at(R0))
+            inc(R0)
+            self.uart.write_byte_binary()

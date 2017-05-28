@@ -688,6 +688,10 @@ additional_names:
         import: "BlockingUart"
     Delay:
         import: "Delay"
+    Ds18b20:
+        import: "Ds18b20"
+    OneWire:
+        import: "OneWire"
 
 parse_helpers:
     matchers:
