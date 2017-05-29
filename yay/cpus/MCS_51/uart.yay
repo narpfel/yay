@@ -35,7 +35,7 @@ class BlockingUart(Mod):
         if byte is None:
             SBUF <- A
         else:
-            if isinstance(byte, (__builtins__["str"], bytes)) and len(byte) == 1:
+            if isinstance(byte, (str, bytes)) and len(byte) == 1:
                 byte = ord(byte)
             SBUF <- byte
         clr(TI)
