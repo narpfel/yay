@@ -59,7 +59,6 @@ class OneWire(Mod):
             A
         """
         # Read byte into `A`
-        swap()
         with self.program.using(R0), self.program.loop(R0, 8):
             self.read_bit()
             rrc()
