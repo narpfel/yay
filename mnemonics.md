@@ -22,42 +22,12 @@ Typographic Conventions
 Notable changes to stock 8051 assembler
 ---------------------------------------
 
-* `MOV*` has been split up into four different families of mnemonics:
-  * `LD*` loads data *into* the accu.
-  * `ST*` stores data *from* the accu.
-  * `MOV*` operates on registers.
-  * `LPM` accesses the program memory.
-
-  Hence, all `LD*`, `ST*` and `LPM` mnemonics take one argument (the
-  accumulator is implicit), whereas `MOV*` operations have *two* operands.
-
-  **TODO:** Decide whether to use the Intel-like form `MOV(destination, source)`
-  or the AT&T-like form `MOV(source, destination)`.
-* Direct addresses are created using the `Byte` class. Hence, `42` translates
-  to `Byte(42)`. That makes it possible to create immediates without any sigil:
-  `#42` → `42`. Indirect addresses are provided by the `at` function: `@R0` →
-  `at(R0)`.
-* Similarly, bit addresses are created using `Bit`. E. g. `OR(~Bit(42))` is
-  equivalent to `ORL C, /42`.
-
-
-### List of `MOV` family mnemonics
-
-| Mnemonic | Effect                       | Equivalent to   |
-|:---------|:-----------------------------|:----------------|
-| `LDD`    | Load `A` with direct         |                 |
-| `STD`    | Store `A` to direct          |                 |
-| `LDR`    | Load `A` from register       |                 |
-| `STR`    | Store to register            |                 |
-| `LDA`    | Load `A` from indirect       |                 |
-| `STA`    | Store to indirect            |                 |
-| `LDI`    | Load `A` with immediate      | `MOV A, #{imm}` |
-| `LPM`    | Load `A` from program memory | `MOVC`          |
-| `LDX`    | Load from eXternal memory    | `MOVX A, *`     |
-| `STX`    | Store to eXternal memory     | `MOVX *, A`     |
-| `LDB`    | Load bit to `C`              |                 |
-| `STB`    | Store bit from `C`           |                 |
-
+* The arrow operator `<-` is syntactic sugar for the `MOV` mnemonic.
+  `x <- y` is always equivalent to `mov(x, y)`.
+* `MOVC` has been renamed to `lpm` (load program memory). The accu does not
+  have to be specified as an argument to this mnemonic.
+* `MOVX` has been split into `ldx` (load external) and `stx` (store external).
+  Like `lpm`, the accu is not explicitly specified as an argument.
 
 
 Indirect addressing
@@ -172,22 +142,22 @@ Complete list of 8051 mnemonics
 | `RRC A`                      | `RRC()`                    |                                         |      |
 | `SWAP A`                     | `SWAP()`                   |                                         |      |
 | **Data transfer operations** |                            |                                         |      |
-| `MOV A, Rn`                  | `LDR(Rn)`                  |                                         |      |
-| `MOV A, {dir}`               | `LDD(dir)`                 |                                         |      |
-| `MOV A, @Ri`                 | `LDR(at(Ri))`              |                                         |      |
-| `MOV A, #{imm}`              | `LDI(imm)`                 |                                         |      |
-| `MOV Rn, A`                  | `STR(Rn)`                  |                                         |      |
-| `MOV Rn, {dir}`              | `MOV(Rn, dir)`             |                                         |      |
-| `MOV Rn, #{imm}`             | `MOV(Rn, imm)`             |                                         |      |
-| `MOV {dir}, A`               | `STD(dir)`                 |                                         |      |
-| `MOV {dir}, Rn`              | `MOV(dir, Rn)`             |                                         |      |
-| `MOV {dir}, {dir}`           | `MOV(dir, dir)`            |                                         |      |
-| `MOV {dir}, @Ri`             | `MOV(dir, at(Ri))`         |                                         |      |
-| `MOV {dir}, #{imm}`          | `MOV(dir, imm)`            |                                         |      |
-| `MOV @Ri, A`                 | `STR(at(Ri))`              |                                         |      |
-| `MOV @Ri, {dir}`             | `MOV(at(Ri), dir)`         |                                         |      |
-| `MOV @Ri, #{imm}`            | `MOV(at(Ri), imm)`         |                                         |      |
-| `MOV DPTR, {addr16}`         | `MOV(DPTR, addr16)`        |                                         |      |
+| `MOV A, Rn`                  | `A <- Rn`                  |                                         |      |
+| `MOV A, {dir}`               | `A <- dir`                 |                                         |      |
+| `MOV A, @Ri`                 | `A <- at(Ri)`              |                                         |      |
+| `MOV A, #{imm}`              | `A <- imm`                 |                                         |      |
+| `MOV Rn, A`                  | `Rn <- A`                  |                                         |      |
+| `MOV Rn, {dir}`              | `Rn <- dir`                |                                         |      |
+| `MOV Rn, #{imm}`             | `Rn <- imm`                |                                         |      |
+| `MOV {dir}, A`               | `dir <- A`                 |                                         |      |
+| `MOV {dir}, Rn`              | `dir <- Rn`                |                                         |      |
+| `MOV {dir}, {dir}`           | `dir <- dir`               |                                         |      |
+| `MOV {dir}, @Ri`             | `dir <- at(Ri)`            |                                         |      |
+| `MOV {dir}, #{imm}`          | `dir <- imm`               |                                         |      |
+| `MOV @Ri, A`                 | `at(Ri) <- A`              |                                         |      |
+| `MOV @Ri, {dir}`             | `at(Ri) <- dir`            |                                         |      |
+| `MOV @Ri, #{imm}`            | `at(Ri) <- imm`            |                                         |      |
+| `MOV DPTR, {addr16}`         | `DPTR <- addr16`           |                                         |      |
 | `MOVC A, @A+DPTR`            | `LPM(at(A + DPTR))`        |                                         |      |
 | `MOVC A, @A+PC`              | `LPM(at(A + PC))`          |                                         |      |
 | `MOVX A, @Ri`                | `LDX(at(Ri))`              |                                         |      |
@@ -211,8 +181,8 @@ Complete list of 8051 mnemonics
 | `ANL C, /{bit}`              | `AND(~bit)`                |                                         |      |
 | `ORL C, {bit}`               | `OR(bit)`                  |                                         |      |
 | `ORL C, /{bit}`              | `OR(~bit)`                 |                                         |      |
-| `MOV C, {bit}`               | `LDB(bit)`                 |                                         |      |
-| `MOV {bit}, C`               | `STB(bit)`                 |                                         |      |
+| `MOV C, {bit}`               | `C <- bit`                 |                                         |      |
+| `MOV {bit}, C`               | `bit <- C`                 |                                         |      |
 | `JC {rel}`                   | `JC(label)`                | `JB(C, label)`                          | 1    |
 | `JNC {rel}`                  | `JNC(label)`               | `JNB(C, label)`                         | 1    |
 | `JB {bit}, {rel}`            | `JB(bit, label)`           |                                         |      |

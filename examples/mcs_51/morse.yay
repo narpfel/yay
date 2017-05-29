@@ -124,14 +124,14 @@ class Main(Program, cpu="MCS_51"):
     @macro
     def load_char(self):
         DPTR <- self.message
-        ldr(self.position_in_message)
+        A <- self.position_in_message
         lpm(at(A + DPTR))
         inc(self.position_in_message)
 
     @macro
     def decode_char(self):
         self.subt(self.last_char)
-        str(self.last_char)
+        self.last_char <- A
 
     @sub
     def morse_char(self):
@@ -158,7 +158,7 @@ class Main(Program, cpu="MCS_51"):
         with self.until(A, 0):
             self.letter_to_morse.lookup_unsafe()
             self.morse_symbol()
-            ldr(R4)
+            A <- R4
             DPTR <- self.multiletter_morse.position
             lpm(at(A + DPTR))
             inc(R4)
@@ -170,32 +170,33 @@ class Main(Program, cpu="MCS_51"):
 
     @macro
     def morse_fixchar(self, char):
-        ldi(ord(char))
+        A <- ord(char)
         self.letter_to_morse.lookup_unsafe()
         self.morse_symbol()
 
     @sub
     def morse_symbol(self):
         symbol = R0
-        str(symbol)
+        symbol <- A
         swap()
         andl(0x0f)
         mask = R1
         str(mask)
-        ldr(symbol)
+        mask <- A
+        A <- symbol
         andl(0x0f)
 
         with self.infinitely():
-            ldr(mask)
+            A <- mask
             clr(C)
             rrc()
             jnc("symbol_end")
-            str(mask)
+            mask <- A
 
-            ldr(symbol)
+            A <- symbol
             clr(C)
             rrc()
-            str(symbol)
+            symbol <- A
             jc("dah")
             self.dit()
             with self.skip():
@@ -239,7 +240,7 @@ class Main(Program, cpu="MCS_51"):
     @macro
     def debug(self, letter):
         with self.using(A):
-            ldi(ord(letter))
+            A <- ord(letter)
             self.uart.write_byte()
 
 

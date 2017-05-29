@@ -24,7 +24,7 @@ class OneWire(Mod):
         self.delay.us(500)
         set(self.pin)
         self.delay.us(65)
-        ldb(self.pin)
+        C <- self.pin
         self.delay.us(500 - 65)
 
     @macro
@@ -39,7 +39,7 @@ class OneWire(Mod):
             A
         """
         if byte is not None:
-            ldi(byte)
+            A <- byte
         self._write_byte()
 
     @sub
@@ -99,7 +99,7 @@ class OneWire(Mod):
         self.delay.us(3)
         set(self.pin)
         self.delay.us(8)
-        ldb(self.pin)
+        C <- self.pin
         self.delay.us(50)
 
 
@@ -185,5 +185,5 @@ class Ds18b20(OneWire):
         self._read_scratchpad()
         with self.program.loop(R1):
             self.read_byte()
-            str(at(R0))
+            at(R0) <- A
             inc(R0)

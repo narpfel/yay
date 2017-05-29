@@ -13,7 +13,7 @@ def test_xor():
 
     class Expected(Program):
         def main(self):
-            ldb(ACC[2])
+            mov(C, ACC[2])
             jnb(ACC[4], "dont_toggle")
             cpl(C)
             Label("dont_toggle")

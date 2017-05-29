@@ -220,12 +220,12 @@ class LookupTableDptr(Mod):
     def in_range(self):
         """Check if `A` is in range of this LUT, i. e. is a possible value."""
         self.program.subt(self.minimum)
-        stb(F0)
+        mov(F0, C)
         self.program.subt(self.maximum - self.minimum)
         andl(~F0)
-        stb(F0)
+        mov(F0, C)
         add(self.maximum)
-        ldb(F0)
+        mov(C, F0)
 
     @sub
     def lookup_unsafe(self):
@@ -237,7 +237,7 @@ class LookupTableDptr(Mod):
         else:
             mov(B, self.itemlength)
             mul()
-        std(B)
+        mov(B, A)
         if self.itemlength != 1:
             inc(B)
         mov(DPTR, self.position)
@@ -291,14 +291,14 @@ class Delay(Mod):
             A
         """
         if time > 0:
-            ldi(time)
+            mov(A, time)
             self._delay_ms()
 
     @sub
     def _delay_ms(self):
         """Busy wait for `A` ms."""
         with self.program.using(R0, R1, R2):
-            str(R0)
+            mov(R0, A)
             with self.program.loop(R0):
                 self._delay_one_ms()
 

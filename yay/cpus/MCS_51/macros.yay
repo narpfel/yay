@@ -76,7 +76,7 @@ class Macros:
 
     @macro
     def xor(self, left, right):
-        ldb(left)
+        C <- left
         label = self.new_label_name("skip_toggle")
         jnb(right, label)
         cpl(C)
@@ -114,15 +114,15 @@ class Macros:
         with self.using(R1, R3):
             for _ in range(2):
                 inc(R0)
-            str(R1)
+            R1 <- A
             with self.loop(R3, 2):
                 B <- 10
                 div()
-                str(R1)
-                ldd(B)
+                R1 <- A
+                A <- B
                 add(ord("0"))
-                str(at(R0))
+                at(R0) <- A
                 dec(R0)
-                ldr(R1)
+                A <- R1
             add(ord("0"))
-            str(at(R0))
+            at(R0) <- A

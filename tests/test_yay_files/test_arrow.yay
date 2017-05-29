@@ -7,6 +7,18 @@ from yay import Program
 
 class Main(Program, cpu="MCS_51"):
     def main(self):
+        # accu <- register
+        A <- R0
+        # accu <- indirect
+        A <- at(R1)
+        # accu <- direct
+        A <- Byte(27)
+        # accu <- immediate
+        A <- 55
+        # register <- A
+        R5 <- A
+        # indirect <- A
+        at(R0) <- A
         # register <- direct
         R0 <- Byte(42)
         # direct <- register
@@ -25,10 +37,22 @@ class Main(Program, cpu="MCS_51"):
         at(R1) <- 55
         # dptr <- immediate16
         DPTR <- 0x8000
+        # direct <- accu
+        Byte(67) <- A
+        # carry <- bit
+        C <- Bit(34)
+        # bit <- carry
+        Bit(38) <- C
 
 
 class Expected(Program, cpu="MCS_51"):
     def main(self):
+        mov(A, R0)
+        mov(A, at(R1))
+        mov(A, Byte(27))
+        mov(A, 55)
+        mov(R5, A)
+        mov(at(R0), A)
         mov(R0, Byte(42))
         mov(Byte(43), R1)
         mov(Byte(27), Byte(123))
@@ -38,3 +62,6 @@ class Expected(Program, cpu="MCS_51"):
         mov(Byte(17), 17)
         mov(at(R1), 55)
         mov(DPTR, 0x8000)
+        mov(Byte(67), A)
+        mov(C, Bit(34))
+        mov(Bit(38), C)

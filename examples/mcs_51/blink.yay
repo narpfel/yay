@@ -12,7 +12,7 @@ class Main(Program, cpu="MCS_51"):
 
         SP <- 0x30
         with self.infinitely():
-            std(P1)
+            P1 <- A
             cpl()
             for _ in range(4):
                 self.delay.ms(250)

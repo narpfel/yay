@@ -294,31 +294,27 @@ mnemonics:
               - [0b0000_0010]
               - ["l15", "l14", "l13", "l12", "l11", "l10", "l9", "l8"]
               - ["l7", "l6", "l5", "l4", "l3", "l2", "l1", "l0"]
-    ldr:
-        - signature: ["register"]
+    mov:
+        - signature: ["accu", "register"]
           opcode:
               - [1, 1, 1, 0, 1, "r2", "r1", "r0"]
-        - signature: ["indirect"]
+        - signature: ["accu", "indirect"]
           opcode:
               - [1, 1, 1, 0, 0, 1, 1, "i0"]
-    ldd:
-        - signature: ["direct"]
+        - signature: ["accu", "direct"]
           opcode:
               - [0b1110_0101]
               - ["direct"]
-    ldi:
-        - signature: ["immediate"]
+        - signature: ["accu", "immediate"]
           opcode:
               - [0b0111_0100]
               - ["immediate"]
-    str:
-        - signature: ["register"]
+        - signature: ["register", "accu"]
           opcode:
               - [1, 1, 1, 1, 1, "r2", "r1", "r0"]
-        - signature: ["indirect"]
+        - signature: ["indirect", "accu"]
           opcode:
               - [1, 1, 1, 1, 0, 1, 1, "i0"]
-    mov:
         - signature: ["register", "direct"]
           opcode:
               - [1, 0, 1, 0, 1, "r2", "r1", "r0"]
@@ -360,18 +356,15 @@ mnemonics:
               - [0b1001_0000]
               - ["s15", "s14", "s13", "s12", "s11", "s10", "s9", "s8"]
               - ["s7", "s6", "s5", "s4", "s3", "s2", "s1", "s0"]
-    std:
-        - signature: ["direct"]
+        - signature: ["direct", "accu"]
           opcode:
               - [0b1111_0101]
               - ["direct"]
-    ldb:
-        - signature: ["bit"]
+        - signature: ["carry", "bit"]
           opcode:
               - [0b1010_0010]
               - ["bit"]
-    stb:
-        - signature: ["bit"]
+        - signature: ["bit", "carry"]
           opcode:
               - [0b1001_0010]
               - ["bit"]

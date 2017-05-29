@@ -66,6 +66,6 @@ class Main(Program, cpu="AT89S8253"):
     def output_temperature(self):
         with self.loop(R1, 2):
             self.uart.write_byte(" ")
-            ldr(at(R0))
+            A <- at(R0)
             inc(R0)
             self.uart.write_byte_binary()

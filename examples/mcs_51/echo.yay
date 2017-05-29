@@ -14,5 +14,5 @@ class Main(Program, cpu="MCS_51"):
 
         with self.infinitely():
             self.uart.read_byte()
-            std(P1)
+            P1 <- A
             self.uart.write_byte()
