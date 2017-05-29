@@ -4,11 +4,11 @@ from yay.cpus.MCS_51.uart import BlockingUart
 
 class Main(Program, cpu="MCS_51"):
     mods = [BlockingUart]
-    
+
     def main(self):
         self.uart = BlockingUart()
 
-        mov(SP, 0x30)
+        SP <- 0x30
 
         self.uart.setup()
 

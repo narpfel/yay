@@ -10,7 +10,7 @@ class Main(Program, cpu="MCS_51"):
     def main(self):
         self.delay = Delay()
 
-        mov(SP, 0x30)
+        SP <- 0x30
         with self.infinitely():
             std(P1)
             cpl()

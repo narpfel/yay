@@ -5,7 +5,7 @@ class Macros:
     @block_macro
     def loop(self, register, n=None):
         if n is not None:
-            mov(register, n)
+            register <- n
         loop_head = self.new_label(f"loop_head_{register}")
         yield
         djnz(register, loop_head)
@@ -116,7 +116,7 @@ class Macros:
                 inc(R0)
             str(R1)
             with self.loop(R3, 2):
-                mov(B, 10)
+                B <- 10
                 div()
                 str(R1)
                 ldd(B)

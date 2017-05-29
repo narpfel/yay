@@ -177,7 +177,7 @@ class Ds18b20(OneWire):
         if bytes not in range(1, 10):
             raise ValueError(f"`bytes` must be in range(1, 10), not `{bytes}`.")
 
-        mov(R1, bytes)
+        R1 <- bytes
         self._read_scratchpad_for_R1_bytes()
 
     @sub

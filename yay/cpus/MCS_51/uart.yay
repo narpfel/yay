@@ -8,7 +8,7 @@ class BlockingUart(Mod):
     """
     @macro
     def setup(self):
-        mov(TH1, 244)
+        TH1 <- 244
         ldd(TMOD)
         andl(0x0F)
         add(0x20)
@@ -37,7 +37,7 @@ class BlockingUart(Mod):
         else:
             if isinstance(byte, (__builtins__["str"], bytes)) and len(byte) == 1:
                 byte = ord(byte)
-            mov(SBUF, byte)
+            SBUF <- byte
         clr(TI)
 
     @sub

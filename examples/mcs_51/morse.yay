@@ -99,12 +99,12 @@ class Main(Program, cpu="MCS_51"):
             self.message = self.add_binary_data(message)
             self.message_length = Lit(len(message))
 
-        mov(SP, 0x30)
+        SP <- 0x30
         self.uart.setup()
 
         with self.infinitely():
-            mov(self.last_char, 0)
-            mov(self.position_in_message, 0)
+            self.last_char <- 0
+            self.position_in_message <- 0
 
             for char in "KA":
                 self.morse_fixchar(char)
@@ -123,7 +123,7 @@ class Main(Program, cpu="MCS_51"):
 
     @macro
     def load_char(self):
-        mov(DPTR, self.message)
+        DPTR <- self.message
         ldr(self.position_in_message)
         lpm(at(A + DPTR))
         inc(self.position_in_message)
@@ -154,12 +154,12 @@ class Main(Program, cpu="MCS_51"):
         self.multiletter_morse.in_range()
         jnc("not_a_valid_morse_char")
         self.multiletter_morse.lookup_unsafe()
-        mov(R4, B)
+        R4 <- B
         with self.until(A, 0):
             self.letter_to_morse.lookup_unsafe()
             self.morse_symbol()
             ldr(R4)
-            mov(DPTR, self.multiletter_morse.position)
+            DPTR <- self.multiletter_morse.position
             lpm(at(A + DPTR))
             inc(R4)
         self.letter_pause()
@@ -207,18 +207,18 @@ class Main(Program, cpu="MCS_51"):
 
     @sub
     def dit(self):
-        mov(self.output_port, LED_ON)
+        self.output_port <- LED_ON
         self.debug(".")
         self.symbol_pause()
-        mov(self.output_port, LED_OFF)
+        self.output_port <- LED_OFF
 
     @sub
     def dah(self):
-        mov(self.output_port, LED_ON)
+        self.output_port <- LED_ON
         self.debug("-")
         for _ in range(3):
             self.symbol_pause()
-        mov(self.output_port, LED_OFF)
+        self.output_port <- LED_OFF
 
     @sub
     def symbol_pause(self):
