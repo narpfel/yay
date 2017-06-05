@@ -6,6 +6,7 @@ requirements = [
     "setuptools",
     "PyYAML",
     "IHex",
+    "yay_ast",
 ]
 
 setup(
@@ -23,7 +24,8 @@ setup(
     },
     install_requires=requirements,
     dependency_links=[
-        "git+https://github.com/narpfel/IHex.git@master#egg=IHex-0.1.4"
+        "git+https://github.com/narpfel/IHex.git@master#egg=IHex-0.1.4",
+        "git+https://github.com/narpfel/yay-ast.git@master#egg=yay_ast-3.6.1",
     ],
     license="GPLv3",
     zip_safe=True,

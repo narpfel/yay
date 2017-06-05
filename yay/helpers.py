@@ -16,6 +16,8 @@ try:
 except ImportError:
     from yaml import Loader
 
+import yay_ast
+
 
 class InvalidRegisterError(ValueError):
     pass
@@ -109,35 +111,48 @@ def ignore_self(function):
     return decorated
 
 
-class MovTransformer(ast.NodeTransformer):
-    def visit_Compare(self, node):
-        is_mov = (
-            len(node.ops) == 1
-            and isinstance(node.ops[0], ast.Lt)
-            and isinstance(node.comparators[0], ast.UnaryOp)
-            and isinstance(node.comparators[0].op, ast.USub)
+class MovTransformer(yay_ast.NodeTransformer):
+    def visit_ArrowAssign(self, node):
+        if len(node.targets) > 1:
+            raise RuntimeError("This cannot happen!")
+
+        mov_expr = yay_ast.copy_location(
+            yay_ast.Expr(
+                yay_ast.Call(
+                    func=yay_ast.Name(id="mov", ctx=yay_ast.Load()),
+                    args=[node.targets[0], node.value],
+                    keywords=[]
+                )
+            ),
+            node
         )
-        if not is_mov:
-            return node
-        else:
-            target = node.left
-            destination = node.comparators[0].operand
-            mov_node = ast.Call(
-                func=ast.Name(id="mov", ctx=ast.Load()),
-                args=[target, destination],
-                keywords=[]
-            )
-            ast.fix_missing_locations(mov_node)
-            return ast.copy_location(
-                mov_node,
-                node
-            )
+        return mov_expr
+
+
+class ToPythonAstTransformer(yay_ast.NodeTransformer):
+    def replace_node(self, node):
+        self.generic_visit(node)
+
+        PyAstType = getattr(ast, type(node).__name__)
+        return ast.copy_location(
+            PyAstType(**dict(yay_ast.iter_fields(node))),
+            node
+        )
+
+    def __getattr__(self, name):
+        if not name.startswith("visit_"):
+            raise AttributeError
+        return self.replace_node
 
 
 class YayFileLoader(SourceFileLoader):
     def source_to_code(self, data, *args, **kwargs):
+        node = yay_ast.parse(data)
+        node = MovTransformer().visit(node)
+        node = ToPythonAstTransformer().visit(node)
+        ast.fix_missing_locations(node)
         return super().source_to_code(
-            MovTransformer().visit(ast.parse(data)),
+            node,
             *args,
             **kwargs
         )
