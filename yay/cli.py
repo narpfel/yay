@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from yay.helpers import import_yay_file
+from yay.importer import import_yay_file
 
 
 def _get_main_class(namespace, class_name):

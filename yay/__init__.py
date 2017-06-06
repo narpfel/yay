@@ -1,10 +1,12 @@
 import sys
 
+import yay_ast as ast
+
 from yay.program import Program, sub, macro, block_macro, Mod
 from yay.helpers import (
-    InvalidRegisterError, InvalidConfigError, WrongSignatureException,
-    YayFinder
+    InvalidRegisterError, InvalidConfigError, WrongSignatureException
 )
+from yay.importer import YayFinder
 
 
 __all__ = [
