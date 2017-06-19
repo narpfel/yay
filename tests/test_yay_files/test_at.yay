@@ -1,0 +1,13 @@
+from yay import Program
+
+
+class Main(Program, cpu="MCS_51"):
+    def main(self):
+        A <- ^R0
+        ^R1 <- A
+
+
+class Expected(Program, cpu="MCS_51"):
+    def main(self):
+        A <- at(R0)
+        at(R1) <- A

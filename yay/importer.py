@@ -40,6 +40,7 @@ class YayFileLoader(SourceFileLoader):
     def source_to_code(self, data, *args, **kwargs):
         node = yay.ast.parse(data)
         node = MovTransformer().visit(node)
+        node = DerefTransformer().visit(node)
         node = ToPythonAstTransformer().visit(node)
         ast.fix_missing_locations(node)
         return super().source_to_code(
@@ -68,6 +69,18 @@ class MovTransformer(CopyLocationMixin, yay.ast.NodeTransformer):
                 args=[node.targets[0], node.value],
                 keywords=[]
             )
+        )
+
+
+class DerefTransformer(CopyLocationMixin, yay.ast.NodeTransformer):
+    def visit_UnaryOp(self, node):
+        if not isinstance(node.op, yay.ast.Deref):
+            return node
+
+        return yay.ast.Call(
+            func=yay.ast.Name(id="at", ctx=yay.ast.Load()),
+            args=[node.operand],
+            keywords=[],
         )
 
 
