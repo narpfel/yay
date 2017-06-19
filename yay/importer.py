@@ -49,33 +49,34 @@ class YayFileLoader(SourceFileLoader):
         )
 
 
-class MovTransformer(yay.ast.NodeTransformer):
+class CopyLocationMixin:
+    def visit(self, node):
+        return yay.ast.copy_location(
+            super().visit(node),
+            node
+        )
+
+
+class MovTransformer(CopyLocationMixin, yay.ast.NodeTransformer):
     def visit_ArrowAssign(self, node):
         if len(node.targets) > 1:
             raise RuntimeError("This cannot happen!")
 
-        mov_expr = yay.ast.copy_location(
-            yay.ast.Expr(
-                yay.ast.Call(
-                    func=yay.ast.Name(id="mov", ctx=yay.ast.Load()),
-                    args=[node.targets[0], node.value],
-                    keywords=[]
-                )
-            ),
-            node
+        return yay.ast.Expr(
+            yay.ast.Call(
+                func=yay.ast.Name(id="mov", ctx=yay.ast.Load()),
+                args=[node.targets[0], node.value],
+                keywords=[]
+            )
         )
-        return mov_expr
 
 
-class ToPythonAstTransformer(yay.ast.NodeTransformer):
+class ToPythonAstTransformer(CopyLocationMixin, yay.ast.NodeTransformer):
     def replace_node(self, node):
         self.generic_visit(node)
 
         PyAstType = getattr(ast, type(node).__name__)
-        return ast.copy_location(
-            PyAstType(**dict(yay.ast.iter_fields(node))),
-            node
-        )
+        return PyAstType(**dict(yay.ast.iter_fields(node)))
 
     def __getattr__(self, name):
         if not name.startswith("visit_"):
